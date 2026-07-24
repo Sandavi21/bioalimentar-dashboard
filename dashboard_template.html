@@ -244,6 +244,10 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.25); box-shadow: 0 0 0 1px var(--border) inset;
   }
   .funnel-bar .pct { font-size: 11px; font-weight: 600; opacity: 0.85; margin-left: 6px; }
+  .funnel-row.detail { margin-bottom: 6px; margin-top: -2px; }
+  .funnel-row.detail .funnel-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .funnel-row.detail .funnel-bar { height: 26px; font-size: 12px; border-radius: 7px; }
+  @media (max-width: 560px) { .funnel-row.detail .funnel-bar { height: 24px; } }
   @media (max-width: 560px) { .funnel-label { width: 78px; font-size: 11px; } .funnel-bar { font-size: 13px; height: 38px; } }
 </style>
 
@@ -807,14 +811,21 @@ function renderTable(rows) {
   document.getElementById('table-wrap').innerHTML = html;
 }
 
-// ---- Embudo: Total (4 pipelines fijos) arriba, y el aporte de cada uno abajo ----
+// ---- Embudo: Total (4 pipelines fijos) arriba, el aporte de cada uno, y el cerrado
+// de BIO BALANCEADOS / MASCOTAS / BIOEQUINOS como sub-barra (LEADS no, a pedido) ----
+const FUNNEL_SHOW_CERRADO = ['BIO BALANCEADOS', 'MASCOTAS', 'BIOEQUINOS'];
 function renderPipelineFunnel(fixedRows) {
   const container = document.getElementById('funnel-pipelines');
   container.innerHTML = '';
   const byPipeline = {};
-  PANORAMA_PIPELINES.forEach(p => byPipeline[p] = 0);
+  const cerradoByPipeline = {};
+  PANORAMA_PIPELINES.forEach(p => { byPipeline[p] = 0; cerradoByPipeline[p] = 0; });
   let total = 0;
-  fixedRows.forEach(r => { byPipeline[r.category_name] += r.count; total += r.count; });
+  fixedRows.forEach(r => {
+    byPipeline[r.category_name] += r.count;
+    total += r.count;
+    if (r.bucket === 'cerrado') cerradoByPipeline[r.category_name] += r.count;
+  });
   if (!total) { container.innerHTML = '<div class="empty-state">Sin datos para el mes seleccionado.</div>'; return; }
   const pipelineColors = {
     'BIO BALANCEADOS': { bg: 'var(--series-cerrado)',    color: 'var(--on-cerrado)' },
@@ -822,24 +833,33 @@ function renderPipelineFunnel(fixedRows) {
     'LEADS':           { bg: 'var(--series-descartado)', color: 'var(--on-descartado)' },
     'MASCOTAS':         { bg: 'var(--brand-red-ink)',     color: '#ffffff' },
   };
-  const stages = [
-    { label: 'Todos los leads', value: total, bg: 'var(--brand-red)', color: '#ffffff' },
-    ...Object.entries(byPipeline)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, value]) => ({ label: name, value, bg: pipelineColors[name].bg, color: pipelineColors[name].color })),
-  ];
+  const stages = [{ label: 'Todos los leads', value: total, bg: 'var(--brand-red)', color: '#ffffff' }];
+  Object.entries(byPipeline).sort((a, b) => b[1] - a[1]).forEach(([name, value]) => {
+    stages.push({ label: name, value, bg: pipelineColors[name].bg, color: pipelineColors[name].color });
+    if (FUNNEL_SHOW_CERRADO.includes(name)) {
+      const cerrado = cerradoByPipeline[name];
+      const convPct = value ? (cerrado / value * 100) : 0;
+      stages.push({
+        label: 'Cerrado', value: cerrado, bg: 'var(--series-cerrado)', color: 'var(--on-cerrado)',
+        detail: true, parentLabel: name, parentValue: value, convPct,
+      });
+    }
+  });
   stages.forEach(s => {
     const pct = total ? (s.value / total * 100) : 0;
     const widthPct = Math.max(pct, s.value > 0 ? 3 : 0.6);
-    const row = document.createElement('div'); row.className = 'funnel-row';
-    const label = document.createElement('div'); label.className = 'funnel-label'; label.textContent = s.label;
+    const row = document.createElement('div'); row.className = 'funnel-row' + (s.detail ? ' detail' : '');
+    const label = document.createElement('div'); label.className = 'funnel-label'; label.textContent = s.detail ? '↳ Cerrado' : s.label;
     const track = document.createElement('div'); track.className = 'funnel-track';
     const bar = document.createElement('div'); bar.className = 'funnel-bar';
     bar.style.width = widthPct.toFixed(1) + '%';
     bar.style.background = s.bg;
     bar.style.color = s.color;
     bar.innerHTML = fmtInt(s.value) + (s.label !== 'Todos los leads' ? `<span class="pct">${pct.toFixed(1)}%</span>` : '');
-    bar.addEventListener('mousemove', (e) => showTip(e, s.label, [['Cantidad', fmtInt(s.value)], ['% del total', fmtPct(pct)]]));
+    const tipRows = s.detail
+      ? [['Cerrado', fmtInt(s.value)], [`% de ${s.parentLabel}`, fmtPct(s.convPct)], ['% del total', fmtPct(pct)]]
+      : [['Cantidad', fmtInt(s.value)], ['% del total', fmtPct(pct)]];
+    bar.addEventListener('mousemove', (e) => showTip(e, s.detail ? s.parentLabel + ' — Cerrado' : s.label, tipRows));
     bar.addEventListener('mouseleave', hideTip);
     track.appendChild(bar);
     row.appendChild(label);
