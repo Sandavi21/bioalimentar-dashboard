@@ -1,0 +1,5 @@
+dashboard.html
+data/aggregated.json
+data/deals_2026_raw.json
+data/users.json
+__pycache__/
