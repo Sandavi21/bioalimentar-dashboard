@@ -30,10 +30,20 @@ import os
 import re
 import urllib.parse
 import urllib.request
+from datetime import datetime, timedelta, timezone
 
 BASE = os.environ.get("BITRIX_WEBHOOK_BASE")
 if not BASE:
     raise SystemExit("Falta la variable de entorno BITRIX_WEBHOOK_BASE (URL del webhook de Bitrix24).")
+
+ECUADOR_TZ = timezone(timedelta(hours=-5))
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+            "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+
+def formatted_now_ecuador():
+    now = datetime.now(ECUADOR_TZ)
+    return f"{now.day} de {MESES_ES[now.month - 1]} de {now.year}, {now.strftime('%H:%M')} (Ecuador)"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 YEAR_START = "2026-01-01T00:00:00"
 YEAR_END = "2027-01-01T00:00:00"
@@ -168,7 +178,9 @@ def main():
         logo_b64 = base64.b64encode(f.read()).decode("ascii")
 
     compact = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
-    final = template.replace("/*__LEADS_DATA__*/", compact).replace("/*__LOGO_B64__*/", logo_b64)
+    final = (template.replace("/*__LEADS_DATA__*/", compact)
+                      .replace("/*__LOGO_B64__*/", logo_b64)
+                      .replace("/*__GENERATED_AT__*/", formatted_now_ecuador()))
     with open(os.path.join(ROOT, "dashboard.html"), "w", encoding="utf-8") as f:
         f.write(final)
 
