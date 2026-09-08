@@ -1,0 +1,3 @@
+# Normalizar finales de linea para evitar avisos LF/CRLF al hacer commit desde Windows.
+* text=auto eol=lf
+*.png binary
