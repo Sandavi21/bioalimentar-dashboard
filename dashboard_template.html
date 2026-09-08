@@ -954,12 +954,9 @@ const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-schem
 setTheme(prefersDark ? 'dark' : 'light');
 window.addEventListener('resize', () => { refresh(); });
 
-// ---- Descargar reporte PDF del panel filtrado (capacidad "downloads" del visor) ----
-let downloadsCap = null;
-(async () => {
-  try { downloadsCap = (window.claude && claude.use) ? await claude.use('downloads') : null; }
-  catch (e) { downloadsCap = null; }
-})();
+// ---- Descargar reporte PDF del panel filtrado ----
+// La descarga real funciona en la pagina publica (GitHub Pages) o abriendo el archivo
+// local. Dentro del visor de claude.ai la plataforma bloquea toda descarga por sandbox.
 
 function filterSummaryText() {
   return { p: [...state.pipelines].join(', ') || '(ninguno)',
@@ -1146,33 +1143,24 @@ async function downloadReport() {
     const blob = doc.output('blob');
     const filename = pdfFileName();
 
-    // 1) Dentro de Claude con sesion iniciada: la capacidad "downloads".
-    if (downloadsCap) {
-      try {
-        await downloadsCap.save({ filename, data: blob });
-        return;
-      } catch (e) {
-        if (e && e.code === 'declined') return;
-        alert('Claude no pudo guardar el archivo (' + ((e && e.code) || '?') + '). '
-          + 'Probá abrir el dashboard desde el link publico (no el de claude.ai).');
-        return;
-      }
-    }
-
-    // 2) Pagina normal (GitHub Pages / archivo local): descarga directa del navegador.
+    // Descarga directa del navegador: funciona en la pagina publica (GitHub Pages) y
+    // abriendo el archivo local. En el visor de claude.ai el sandbox la deja inerte.
+    let started = false;
     try {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = filename;
+      a.href = url; a.download = filename; a.rel = 'noopener';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
-      return;
-    } catch (e) { /* sigue al fallback */ }
+      started = true;
+    } catch (e) { started = false; }
 
-    // 3) Visor de Claude sin sesion: la plataforma bloquea toda descarga.
-    alert('Este visor no permite descargar archivos. Opciones:\n'
-      + '  - Inicia sesion en claude.ai (cuenta gratis) y volve a abrir el link, o\n'
-      + '  - Abri el dashboard desde el link publico que te pasaron (GitHub Pages).');
+    if (!started || (window.claude !== undefined)) {
+      // Estamos dentro del visor de claude.ai (sandbox) -> avisar donde si funciona.
+      alert('El visor de claude.ai no permite descargar archivos.\n\n'
+        + 'Abri este dashboard desde el enlace publico (GitHub Pages) que te pasaron y el boton '
+        + 'baja el PDF sin necesidad de iniciar sesion.');
+    }
   } finally {
     btn.disabled = false; btn.textContent = prev;
   }
