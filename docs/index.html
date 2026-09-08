@@ -1,0 +1,1180 @@
+<title>Leads x Asesor — Bioalimentar 2026</title>
+<style>
+  :root, .viz-root {
+    color-scheme: light;
+    --surface-1:      #ffffff;
+    --page-plane:     #f2f2f0;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #4a4a4a;
+    --text-muted:     #8a8a89;
+    --gridline:       #e6e5e2;
+    --baseline:       #c9c8c4;
+    --border:         rgba(11,11,11,0.10);
+    --card-shadow:    0 1px 2px rgba(11,11,11,0.06);
+    --brand-red:      #c8102e;
+    --brand-red-ink:  #9c0c24;
+    --series-asignado: #9a9a97;
+    --series-total:     #c8102e;
+    --series-cerrado:  #0b0b0b;
+    --series-negado:   #c8102e;
+    --series-descartado: #d99aa1;
+    --on-asignado:    #1a1a1a;
+    --on-cerrado:     #ffffff;
+    --on-descartado:  #1a1a1a;
+    --chip-bg:        #f0f0ed;
+    --header-bg:      #0b0b0b;
+    --header-ink:     #ffffff;
+    --header-ink-muted: rgba(255,255,255,0.62);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])),
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0a0a0a;
+      --text-primary:   #ffffff;
+      --text-secondary: #c9c8c4;
+      --text-muted:     #8a8a89;
+      --gridline:       #2c2c2a;
+      --baseline:       #3a3a38;
+      --border:         rgba(255,255,255,0.12);
+      --card-shadow:    0 1px 2px rgba(0,0,0,0.5);
+      --brand-red:      #ff4d5e;
+      --brand-red-ink:  #ff7382;
+      --series-asignado: #a8a8a5;
+      --series-total:     #ff4d5e;
+      --series-cerrado:  #ffffff;
+      --series-negado:   #ff4d5e;
+      --series-descartado: #b56770;
+      --on-asignado:    #1a1a1a;
+      --on-cerrado:     #1a1a1a;
+      --on-descartado:  #ffffff;
+      --chip-bg:        #242423;
+      --header-bg:      #000000;
+      --header-ink:     #ffffff;
+      --header-ink-muted: rgba(255,255,255,0.58);
+    }
+  }
+  :root[data-theme="dark"],
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0a0a0a;
+    --text-primary:   #ffffff;
+    --text-secondary: #c9c8c4;
+    --text-muted:     #8a8a89;
+    --gridline:       #2c2c2a;
+    --baseline:       #3a3a38;
+    --border:         rgba(255,255,255,0.12);
+    --card-shadow:    0 1px 2px rgba(0,0,0,0.5);
+    --brand-red:      #ff4d5e;
+    --brand-red-ink:  #ff7382;
+    --series-asignado: #a8a8a5;
+    --series-total:     #ff4d5e;
+    --series-cerrado:  #ffffff;
+    --series-negado:   #ff4d5e;
+    --series-descartado: #b56770;
+    --on-asignado:    #1a1a1a;
+    --on-cerrado:     #1a1a1a;
+    --on-descartado:  #ffffff;
+    --chip-bg:        #242423;
+    --header-bg:      #000000;
+    --header-ink:     #ffffff;
+    --header-ink-muted: rgba(255,255,255,0.58);
+  }
+  :root[data-theme="light"] .viz-root { color-scheme: light; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px 60px; }
+
+  .brand-band { background: var(--brand-red); height: 4px; }
+  header.top {
+    background: var(--header-bg); color: var(--header-ink);
+    margin: 0 0 24px; padding: 22px 0 24px;
+  }
+  header.top .wrap { padding-top: 0; padding-bottom: 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  header.top .brand-mark { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  header.top .brand-mark .logo-img { height: 30px; width: auto; display: block; }
+  header.top .brand-mark .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.18); }
+  header.top .eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--header-ink-muted); font-weight: 600; }
+  header.top h1 { font-size: 24px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+  header.top p { font-size: 13px; color: var(--header-ink-muted); margin: 0; }
+  .theme-toggle {
+    display: flex; gap: 2px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px; padding: 3px;
+  }
+  .theme-toggle button {
+    font: inherit; font-size: 11px; font-weight: 600; color: var(--header-ink-muted); background: none; border: none;
+    border-radius: 999px; padding: 5px 12px; cursor: pointer;
+  }
+  .theme-toggle button.active { background: var(--brand-red); color: #ffffff; }
+
+  .view-toggle { display: flex; gap: 2px; background: var(--chip-bg); border: 1px solid var(--border); border-radius: 999px; padding: 3px; flex-shrink: 0; }
+  .view-toggle button {
+    font: inherit; font-size: 11px; font-weight: 600; color: var(--text-secondary); background: none; border: none;
+    border-radius: 999px; padding: 5px 12px; cursor: pointer;
+  }
+  .view-toggle button.active { background: var(--brand-red); color: #ffffff; }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 18px 20px;
+  }
+
+  /* filter bar */
+  .filterbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-bottom: 18px; padding: 12px 14px;
+  }
+  .filterbar .fb-label { font-size: 12px; color: var(--text-muted); margin-right: 2px; }
+  .combo { position: relative; }
+  .combo-btn {
+    font: inherit; font-size: 13px; color: var(--text-primary);
+    background: var(--chip-bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .combo-btn:hover { border-color: var(--brand-red); }
+  .combo.open .combo-btn { border-color: var(--brand-red); }
+  .combo-btn .car { font-size: 10px; color: var(--text-muted); }
+  .combo-panel {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 20;
+    min-width: 220px; max-height: 280px; overflow-y: auto;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18); padding: 8px;
+  }
+  .combo.open .combo-panel { display: block; }
+  .combo-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+  .combo-row:hover { background: var(--chip-bg); }
+  .combo-row input { accent-color: var(--brand-red); }
+  .combo-actions { display: flex; gap: 8px; padding: 4px 8px 8px; border-bottom: 1px solid var(--gridline); margin-bottom: 4px; }
+  .combo-actions button {
+    font: inherit; font-size: 11px; font-weight: 600; color: var(--brand-red); background: none; border: none; cursor: pointer; padding: 0;
+  }
+  .reset-btn {
+    font: inherit; font-size: 13px; color: var(--text-secondary); background: transparent;
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; cursor: pointer;
+  }
+  .reset-btn:hover { color: var(--brand-red); border-color: var(--brand-red); }
+  .dl-btn {
+    font: inherit; font-size: 13px; font-weight: 600; color: #ffffff;
+    background: var(--brand-red); border: 1px solid var(--brand-red);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer;
+  }
+  .dl-btn:hover { background: var(--brand-red-ink); border-color: var(--brand-red-ink); }
+  .dl-btn:disabled { opacity: 0.6; cursor: default; }
+  .fb-summary { margin-left: auto; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  /* KPI grid */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 22px;
+  }
+  @media (max-width: 980px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); margin-bottom: 0; }
+  @media (max-width: 700px) { .kpi-grid-3 { grid-template-columns: 1fr; } }
+  .kpi {
+    background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--accent, var(--gridline));
+    border-radius: 10px;
+    padding: 14px 16px; box-shadow: var(--card-shadow);
+  }
+  .kpi .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 0 1px var(--border) inset; }
+  .kpi .label { font-size: 11px; letter-spacing: 0.02em; color: var(--text-secondary); display: flex; align-items: center; text-transform: uppercase; }
+  .kpi .value { font-size: 27px; font-weight: 700; margin-top: 7px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  .section-title { font-size: 15px; font-weight: 700; margin: 0 0 2px; padding-left: 10px; position: relative; }
+  .section-title::before { content: ''; position: absolute; left: 0; top: 2px; bottom: 2px; width: 3px; background: var(--brand-red); border-radius: 2px; }
+  .section-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 14px; padding-left: 10px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+  .stack { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--text-secondary); }
+  .legend .item { display: flex; align-items: center; gap: 6px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; box-shadow: 0 0 0 1px var(--border) inset; }
+  .legend .sw-line { width: 16px; height: 0; border-top-width: 2px; display: inline-block; }
+
+  .bar-row { display: flex; align-items: center; margin-bottom: 10px; }
+  .bar-row .name { width: 190px; flex-shrink: 0; font-size: 12px; color: var(--text-primary); padding-right: 8px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-row .track { flex: 1; position: relative; height: 22px; }
+
+  .axis-label { font-size: 10px; fill: var(--text-muted); }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .baseline { stroke: var(--baseline); stroke-width: 1; }
+
+  #tooltip {
+    position: fixed; display: none; pointer-events: none; z-index: 100;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2); padding: 8px 10px; font-size: 12px; color: var(--text-primary);
+    max-width: 240px;
+  }
+  #tooltip .tt-title { font-weight: 600; margin-bottom: 4px; }
+  #tooltip .tt-row { display: flex; justify-content: space-between; gap: 12px; }
+  #tooltip .tt-row .k { color: var(--text-secondary); }
+
+  .table-toggle {
+    margin-top: 18px; font-size: 12px; font-weight: 600; color: var(--brand-red); background: none; border: none; cursor: pointer; padding: 0;
+  }
+  table.datatable { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; font-variant-numeric: tabular-nums; }
+  table.datatable th, table.datatable td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--gridline); }
+  table.datatable th:first-child, table.datatable td:first-child { text-align: left; }
+  table.datatable th { color: var(--text-muted); font-weight: 600; font-size: 11px; }
+  table.datatable tr:hover td { background: var(--chip-bg); }
+
+  .glossary { margin-top: 22px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .glossary b { color: var(--text-primary); }
+  .footnote { margin-top: 18px; font-size: 11px; color: var(--text-muted); }
+
+  .empty-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+  /* funnel */
+  .funnel { max-width: 640px; margin: 4px auto 0; }
+  .funnel-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .funnel-row:last-child { margin-bottom: 0; }
+  .funnel-label { width: 110px; flex-shrink: 0; text-align: right; font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+  .funnel-track { flex: 1; }
+  .funnel-bar {
+    height: 44px; border-radius: 10px; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; transition: width .25s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25); box-shadow: 0 0 0 1px var(--border) inset;
+  }
+  .funnel-bar .pct { font-size: 11px; font-weight: 600; opacity: 0.85; margin-left: 6px; }
+  @media (max-width: 560px) { .funnel-label { width: 78px; font-size: 11px; } .funnel-bar { font-size: 13px; height: 38px; } }
+
+  /* ---- Impresion / Guardar como PDF (funciona sin sesion iniciada) ---- */
+  .print-only { display: none; }
+  @media print {
+    @page { margin: 12mm; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #fff; color: #111; }
+    .wrap { max-width: none; padding: 0; }
+    .brand-band { background: var(--brand-red) !important; }
+    header.top { background: #fff; color: #111; margin: 0 0 12px; padding: 0 0 10px; border-bottom: 1px solid #ddd; }
+    header.top p { color: #555; }
+    header.top .eyebrow { color: #777; }
+    header.top .divider { background: rgba(0,0,0,0.15); }
+    .theme-toggle, .filterbar, #btn-download, .table-toggle, #tooltip { display: none !important; }
+    .print-only { display: block; }
+    #print-head {
+      font-size: 11px; color: #333; margin: 0 0 16px; padding: 8px 10px;
+      border: 1px solid #ddd; border-radius: 6px; line-height: 1.6;
+    }
+    #print-head b { color: #111; }
+    #table-wrap { display: block !important; }
+    .card, .kpi { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .grid-2, .bar-row, .funnel-row { break-inside: avoid; }
+    .section-title { break-after: avoid; }
+    .glossary { break-inside: avoid; }
+  }
+</style>
+
+<div class="viz-root">
+<div class="brand-band"></div>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="brand-mark">
+        <img class="logo-img" alt="Bioalimentar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+gAAAIqCAYAAAC39GDvAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAPqFJREFUeNrs3U921MbaB2DlO5l4dH1nzNIZMoqzAtoriFkB9gqwV2CzApsVuFkBZgWIFeCMGKbvjGHfEcP7qXB1MI5t+o9UKqme55y+vkkAm7dbUv1Ur6qqCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICs/rfsbPu883Wu+nCsd/NC8ef3nnn9/3bwWy3948uVTrVQAQC6a8f701j/uNq+9e37Zb/G/GRdBzwE9HLDvlQ46Ud+5iC3ihcsFCwDYNnjv3Qrc4esvzWsS//M0sx/37zFQ/PrfOD4Kr0UzLrr2jiKgC+iQy8VqGeBDaJ83F6m50gAAzVh9EkP39FYAn9wK4mOyDOzLAG9chIAOZKOOF6k/w4XKjDsAjDqIL2fCw+u3W6Ec4yIEdCDji9N1vDjV7igDwGAD+TSG8Wfx60RV1jaPYyOhHQEdyOrC9EFgB4Bsw3iYHZ/GML4M5nQjjIuub42NFkqCgA705XoZ2JsL0pVyAIBAbmz03WSGwI6ADvRiES9I75rXlQsSAHQaykMIP2hefwjkWVuG9SsrxyOgA326EtYBoLVAvhsD+bP4dVdVBmdxa3xkdh0BHeg1rL/RBg8Aa42bJ9VNy/ofMZQzvvGRyQwEdKA34eIzi2FdmxcA/HOsHGbGD5vXi0rrurAOAjqQSAjor5uL0EwpABDK/36e3Ew5wjoCOtCbcOF53bxmtm0DoLBgvgzlh6rBA2Ok5WOCtXIgoAOpzZrXK0EdgBGH8kn1rYV9oiKsKIyN3lQmNBDQgZ6CurvFAIwpmC9D+VQ12JLFdxHQgV6EgH5iQTkABhrKJ5XZcrozr749JuhZdQR0IJlZpfUdgOEE87D6+svKs+UYKyGgAyO/+Jy4SwxApsH8IAbzqWrQkzoG9VopyvR/SgAkdNi8/moGQGdKAUBGwfywef3V/N+3wjk9C5+/9+HzGNc9oDBm0IG+zJvXkTvEAPQUysPe5SEAhRnziYqQ8XgpzKjPlEJAF9CBFK5iUNf2DkCqYH4cg/muiiCokxMt7kDfwvN+oY3rWCkA6DKYx0esQiv7qXDOwEya16XW9/Ezgw7kpK5uZtPnSgFAi+H8WChnZMJYyYz6CJlBB3IybV4f3RkGoKVgvlz87Vw4Z2Qm1bcZ9QPlGA8z6ECuPJsOwKbBfBpD+Z5qUIi6sj3bKJhBB3IV7gZ/jIMsAFglmE+aV5hIei+cU5gwXgrbs70Nx4FyCOgAXZjEi40F5AB4LJiHBeDCjPlflX3MKdty8d2zuGMBAjpA687jHWEXGgDuhvPjGMzdzIVvTmNQP1QKAR2gC+GOcJhN17IIQAjme83rY2UBOHhIOC7CQnLGTwI6QCf2Yki3WilAucF82c7+sfKcOaxiWt2s66PtXUAHaF24sLzVsgVQZDj/+nxtpZ0dNnFaWYBXQAfoSGjZulQGgCKCeVid/W3zf8PLDCBsblJ9W+3dsSSgA7TqUEgHGH04D7PloZ3d403QnuVq746rzPy0wUlyWt3sLQmQi7p5PX/y5dNCKQBGE8wnzZdwE3aqGtCpq+Z1ZByVBzPowBiEwdt7rVoAownnh9XNrLlwDt0zmy6gA7RuT0gHGHww343PmoeZc+dzSGe5CO+lsZSADiCkAwjn0+pmhXazeNCfw8pK7wI6gJAOUHQ4D/uahzWOnLuhf5M4ljpTCgEdoLWQrgwA2QfzsH1aeNbcvuaQn9Pm+DTpIaADtBPSbcEGkHU4D63sIZzvqQZka1rdLCA3VQoBHWBb9kkHyDOch5b2sBicmTnIXzhOtbwnYh90oAQnT758ulAGgN6D+W4cR5o1h2Gqm9dze6Z3xww6UILzuKcuAP2F82l1s0q7cA7DFY7jsMq741hAB9g6pLuYAPQTzsMicFZph3GYVDct74dKIaADbCoMCt9aiRQgeTgPa4GcqwSMblx1GdeTQEAH2MikulmUCIDug/lu3ELtUDVgtI5txSagA2xjahVSgM7DeXikyBZqUMjYqrppeXe8C+gAGzm1nydAZ+H862C9uulaAsqwJ6QL6ADbuNSOBdB6OD+sLAYHpQrH/UeLx23nZyUACjUJIb15PVcKNgwie3EwMo3/6l/Vj9t5w76xf8b/P1++nnz5NFdRRnBMhMWijlUCihcmQarm2jZTivX9tMHJNwxE3isdMBLPmwvIlTKwwrUvvH6LIXzSwbepY2APAb5uPpfXKs+AjpFww/NQJYBbZs217EgZBHSAdYQZzV+bC8hCKbh1rQsh/KB5/VH1t8jVIob2D83ryiw7mR4rX7daiscLgJAuoAO4eNBK0AjXtxcxaOT4/GyYUX8jrJNZOA9jQotCAY8JnYpHJkMEdIB17DcXjloZigsYk+qmLTcE88mAfvTwWX3j+T6Ec2AgruNYS0gX0AFWEhbq+lUZigkX4Vr2shp+W24Y6LyubrpA5t5ZhHNASB8226wB3Jg0g84zZRh/MG9e72O4GMMzsyEonTavv8IiXbEjALo8hvaEc2BDy73SbcP4CDPoAN9YMG7EwTwG2WkBf91Z8zrxOabDcG5wDWzDTPojzKADfBMGnefKMKpAMbk1Yz4t5K99WN3MqJ+ZpUA4BzJkJl1AB1g93GgTHkWY2I2PLPxVUDC/bdn6/jF2D4BwDgjpAjrAIJ0qwaDDRAikH72PX03iAOitQRAbHk8T4RwQ0gV0gD6ZRR9umDiPYcL7972wIN5fZtNZ83gKg+a3wjkgpAvoAH0z+zqsILHXvMKs+bFqPGg3DoKss8Cq4dxq7YCQLqADZMEs+nCCxIEgsZbjcDPDQAjhHBDSBXSAITGLnn+QOKu04G46EPorLv4FwjmQy7XpUkAH4CFm0fMOEuEi7ibK5pYt74dKwS3nwjnQo4N4fRfQAbg/pCtBdsF8Nz5v7r1pJ6RfCunEY+vScQXkMPYqeb0UAR3gcS+VIK9wXmm/7UII6RbYK/vYOhPOgYwcl3rzWEAHeNyu2UXhvBDnpbcVFnxshXOcx0WA3BTZ4SWgA/zYCyUQzgtx6IZUccfWtLIoE5Cv89IWNBXQAX5sarE44bwgnkkv59gKx9RblQAytlzQtJhxmIAOsBrPovcYGIVzIZ3Ww/luZYtCYDgh/W0pe6QL6ACrOVCCXkLEpdr35tw+6aMWulImygAMRDF7pAvoAKuZCCvJw/lhZVXpPi3bCs2wju/Y0pUCDNFBCduvCegAq7NYXLoAUcyd8gGEdM8oj+vYOqzc+AKGa/TbrwnoAKvTap0mQAiFeZnGPbIZ/rHlxhcwBqN+BEtAB1idNvc0QoCYKENWTuN2XAw3nC93QwAYulEvGiegA6xHm3u3ISJ0KehUyNOl59EHzYrtwJhMqpF2BAnoAOuZKkFn4Xy30n6b+2DoVBkGeWydO3cBIxQWjTsW0AHKttdcDCbK0IkQzs3w5e1Yq/vgwnnoSDlWCWCkzsd2XRLQAdYnoLQfIkJNtbYPgy6H4RxXE+8XUIBRPY8uoAOs75kSCH0Fm1jVfTiD1kpXCjB+o3pETkAHWN9UCdoTnx+bqMSgvLRgXPbH1Vnzxa4TQClG8zy6gA6wvonn0FsLESHkWXhseLxveR9XU+8PUKBR7I8uoANsZqoErTiutOAO9r1zoyrLcG43BKBkg98SVEAH2MxvStBKkHipEoNmljbDwWnlkRGgXHtDvzYJ6ACbmSrB1syeD9+BZ9HzEbdUsxsCUPz4YshbrwnoAJux+NL2XijB4IVwbo/tPMK51naAbwbb6i6gA2w+IJ6qwsa1O6y04Y6FGy2ZDEYrHSkAS2GMMchWdwEdYLuTP0Jd8cdBvOFCT7S2A9xrkK3uAjqAgJ46TIS6TVViVP5Qgt6OJ63tAA8bXKu7gA6wuWdKsBErt4/PgS3X+ht8VlrbAR4Srk2DanUX0AG2O+mzQZhTAu8r24utm+oO8LhBtboL6AACespAsaduo2VdgbTHktZ2gNWdC+gA5QROVme2b7z27ImeVNjebqIMACtfo84EdIDxE0jWYzGxcXMDJoF4Y/BUJQDW8nII66UI6ADbmSrByqEi3MzQcTBuFk5M41wJANa2O4Tzp4AOQCpTJfAes52457w6A2zmIPcF4wR0gO38pgQrM7s6fhPbrXUazsPsj9Z2gO1kvcCmgA6wHc+gr057exmmStAZC8MBbC/cTD4W0AEQ3CiBrpIOxM4Es+cA7TjNdecRAR1A6EwRLsyel8N73dFgUgkAWpPtI0MCOgBCG97rjMUFjQ5VAqBVxzmumyKgA5DCRAmKsZtr2+CAmT0H6EZ2264J6ABbsmr1SjyXXBaz6O2dX6aVR2kAupLdtmsCOsD2BPQfM6Pq/WYzl0oA0KmsupQEdABSmChBUcygt+DzztNDxw5A56Y5zaIL6AAI6JAnz54DpJHNs+gCOgDQtn8pwXbMngMktRfPuwI6ADC+gY4SbM3sOUCB510BHYBOfd55KqzBesfMYWX2HCC1SQ6z6AI6AF2zojesx+w5QKHnXwEdACATZs8BejXpe0V3AR0AIB9mzwEKPg8L6AAAGTB7DpCFXvdFF9ABAPLwQgkAstDbLLqADgDQszhbM1UJgCyEWfSJgA4AUKaXSgCQlV5m0QV0AIAexVmaA5UAyMphc35OvlWsgA4A0C+z5wB5OhbQAYZnoQTAJuLszKFKAGQp+eKdAjrAlp58+XStCsCGQmv7rjIAZGkSt8AU0AEACnCqBABZSzqLLqADAPQgbq02UQmArCXdck1AB9hOrQTAhl4oAcAgJOt2EtABABKzOBzAoCTbClNAB9jOXAmADQjnAMOxm2qxOAEdYDv/UQJgA9rbAZy3BXSAls2VAFjH552ne82XPZUAGJQki8UJ6AACOpCW2XOAYToU0AEEdMAAD4D+dX6DVUAH2MKTL58EdGBln3eehpWAd1UCYJAm8TElAR0gQ7USAGv6QwkABq3TWXQBHWBzcyUA1nSgBACDdiigA+TpTyUAVhX30NXeDjBsu/FxJQEdIDPXSgCsQXs7gPO5gA7QhSdfPtWqAKxBezuA87mADtABs+fAyrpshwQgudDmPhXQAQR0YJi0twM4rwvoAB35oATAGsygAzivC+gAHamVAFhFbIO0ejvAuEya8/uegA7Qv/mTL5/mygCsSHs7wDhNBXSA/l0pAbAG7e0A4/RCQAfon+fPgZV83nk6ab5MVAJglPaa83yrjzAJ6ADrq5UAWJHZc4BxmwroAP25evLl00IZgBU9UwKAUWt1nREBHWA975QAWMNUCQCc5wV0gG5YIA5Yie3VAIowieuNCOgAqcO59nZgDVMlAChCa+uNCOgAq9PeDqzD8+cAzvcCOkAHwsy59nZgHVMlAHC+F9AB2qe9HVhZfP4cgDLstvUcuoAOsJrXSgCsYU8JAIoyFdAB0rh+8uXTtTIAa/D8OYDzvoAO0AGz58C6pkoAUJRWOqcEdIDHLZ58+TRTBmBV8TlE+58DFBbQm/P/1ud+AR3gcWbPgXVNlQCgzJAuoAN0J6zafqEMwJp+UwKAIk0FdIDuvLa1GrABK7gDlGnrG7QCOsD9zJ4Dm5oqAUCRtLgDdMTsObC2zztPzZ4DlGuy7UJxAjrAP5k9BzYenCkBQNG2ulEroAP8k9lzoJeBGQCDNxXQAdozb8L5mTIAG3qmBABF+0VAB2jPiRIAW5goAYDrgIAOsL36yZdPV8oACOgAbGgqoANsLzxzfqQMwKY+7zydqgIAzfVgIqADbCcsDDdXBmALu0oAQLVFN5WADlBV1xaGA1pgBXcAtroeCOhA6bS2A235RQkAqLboqBLQgdK9evLl07UyAC2YKAEA1RZbbgroQMmumnB+oQxAS7S4AxCYQQdYk9Z2IJsBGQCj4hl0gDXtP/nyaaEMQBs+7zw1ew7A7evCRjdtBXSgRCeeOwdaZvYcgNs2unEroAOlmXnuHMhlIAYAAjpQqrDfuefOgS6YQQfgtqmADvBIOG9e+8oAdORfSgDAtgR0oARfV2y3KBzQIS3uANz2i4AOcH8437coHAAACU0EdIB/Es6BbAdiACCgA6U4Es4BAR2AHthmDeBOOJ8pAwAAPdhodw8BHRDOAbbweeepLdYAaIWADozJckE44RxIyQruAPzDJjdwBXRgbOG8VgoAADKw9g1cAR0YUzi3IBwAAIMloANDF0L5r8I5AAACOkB/rqqbmfOFUgA9mioBAG34WQmAgbpogvmJMgAAkCmLxAFFeCWcAwCQOYvEAUU4/bzz9NzewwAAjImADgzVcfP6qwnpB0oBAICADtCvMIP+tgnp75vXRDkAABDQAfo1bV4fm5B+qBQAAAjoAP0Ks+mXTUh/69l0AAAEdID+hWfSw7PpU6UAAEBAB+hXmEEPz6WfKwUAAAI6QP+Om5D+Ucs7AAACOkD/9qqblvc9pQAAQEAH6FeYQbfKOwAAAjpAJsIq75fKAACAgA7Qv8MmpL/3XDoAAAI6QP+m1c0q70I6AAACOkDP9mJIt3gcAABdWAjoAEI6AAD9uxbQAdazK6QDW5orAQBtENABhHRAQAdAQAcQ0gEAQEAHENIBAOiGReIAWgjpb23BBgDANp58+WSROIAWTCr7pAOrD8BqVQCgDQI6wP1Cm/tbZQAAQEAH6N/0887TS2UAAGBN15v8JgEd4HGHTUg/VAagi4EYAKO12OQ3CegAP3ZpZXegi4EYAAjoAOuzaBwAAKvS4g7Qoa/brykD8IAPSgDALf8V0AG6FRaNO1MGAAB+wDPoAAmceh4duIdF4gDY+rogoAOs763n0YE7LBIHwNYEdID1TZrXqTIAt8yVAIClJ18+1QI6QDrHn3eeTpUBiAMxAR2ArQnoAJs7VwLgFiEdgKAW0AHS27OqOyCgA3DHxuuSCOgA23lpwTggspI7AMGfAjpAP0I41+oOBP9VAgCqLTqqBHSA7R3aGx2otnjmEAABXUAHaI9ZdGCuBABUWzzyJKADtGNq2zUom63WAGgsmuuBReIAMnCqBFC8WgkAirbVgqECOkB7zKIDcyUAENAFdIA8mEWHsv1HCQCK9uc2v1lAB2iXWXQoW60EAEWbC+gAeXmhBFCsayUAKNeTL59qAR0gL2Ff9IkyQJEDs7By71wlAIq09U1aAR2go5CuBGCABoDzv4AO0L+XSgDF+lMJAJz/BXSAfOx+3nl6oAxQpFoJAIpkBh0gYxaLAwM0AAqx7QJxAjpAtw4+7zzdVQYoboC2ENIBilO38YcI6ADdOlQCKJKADuC8L6ADZEabO5TpgxIAOO8L6AB52bMnOhSpVgIA530BHSA/UyWAsjz58mnefJmrBEARruP6IwI6wAD8oQRQpFoJAJzvBXSAvNgPHcrkOXQA53sBHSA3n3eeCulQnloJAJzvBXSA/DxTAiiL59ABitDa8+cCOkA6UyWAItVKAOA8L6AD5CVst7arDFCcd0oA4DwvoAPkZ6oEUJxaCQBGa/Hky6dWz/MCOkA6e0oAZYnPJQrpAOPU+vldQAdIx0JxUCZt7gDO7wI6QGamSgBFulICAOd3AR0gM593nmpzh8LYbg1glFrdXk1AB+jHRAmgSGbRAcblTRd/qIAOkJYZdDCQA2D4OrnxKqADpGWhOCjQky+fritt7gBjcR0fXxLQAQZuVwmgWNrcAcahs64oAR0gLS3uYEAHwLB1dsNVQAdI7PPO04kqQHm0uQOMQmft7QI6QD8EdCiXNneAYeu0G0pAB0hPmzsY2AEwTJ3eaBXQAdKzUBwUKra5X6sEwCDVXba3C+gA/fiXEkDRzKIDOH8L6ACZ0OIOZZspAcDgLKoE64gI6AAACT358inJIA+AVl3F87eADjAyEyWA4mlzB3DeFtABBHSgb0++fAoz6HOVABiEeXPergV0AIDxMosOMAyvU30jAR0AoB8zJQBwvhbQAXr2eeepvdChcHEvXYvFAWQezlMsDiegA/TLVmtA8FoJAJynBXQAgJ7FRYfmKgGQpbo5T18L6AAA5XilBABZSr6Yp4AOANCv8Bz6QhkAshK2VpsJ6AAABYmLD3kWHSAvvWyFKaADAPRvpgQA2Qg3Ti8EdACAAsUt14R0gDwk3VpNQAcAyI/F4gDy0NtjRwI6AEAG4iz6lUoA9GoWz8cCOgBA4SwWB9CvXruZBHQAgEw8+fKpbr7UKgHQi15nzwV0gP5cF/R3nXu7YS2eRQco9PwroAP0oK+VQXv6uwro5fGeb3fM1JVZdIDUZjmMWQR0AFJYKEFR/qMEWzOLDlDgeVdAByCFayWA1ZlFB0hqlkvHn4AOkJ7ZZMbODZl2mEUHKOx8K6ADCC/+zrTNTagWxFn0mUoAdGqW03o5AjoAKfxXCYrihkx7zKIDdCfcUD7J6QcS0AH6uRiUpva2l6OkXQoS1HJemUUH6Mrr3K5ZAjpAen8W+Heee9uLUStB68LsjpseAO0K59WL3H4oAR2AztkLvSje6/aPnzCIfK0SAK06ybHjS0AHSK/U53Nrb30RPihBJyH9rHLzA6C1sVhzXp3l+IMJ6ADpldqqKrgVMuhRgs6cKAHAuM+nAjqAAOPvTVsWT7588j53pKntVaUTBWBbV3EbSwEdgKJXuBYsvMdszyw6wOay21ZNQAfoV7Gzi/HGhAA3bh5j6P44CueQC5UA2Mjr3BeuFdAB0poX/vd/5yMwaldKkMQr5xKA9cdgccHNrAnoAGn9Wfjfv/YRGK1r2+mlEbtRtLoDrOdoCD+kgA6QOMQUHizC31+IG6c3SpD0WLJgHMDqZjkvDCegA/RHOBXkxkp7e3phNmihDACPGlTXkYAOkJAtqL6aKcHoaG/v53wSav5KJQAedTSkHXQEdIB0aiX4O1Soxbi8VoLejqcLxxPAw2Ov+EjQYAjoAOmYPf9Gm/t4hFkJ7e39smAcwP3Xp6Oh/dACOkA6fyrBjSdfPs0qz+OPxWxIrYMjPZ7CzT+t7gDfezXEx68EdIB0aiX4jln0cdDenkdIP3OOAfg25oqPAA2OgA6QxtwiWv8QLpxmXodt5nOdFau6A9ycB58P9YcX0AHSqJXge7Et2uzrsGmrzuuYmntPAIa1aruADtCPD0pwL7Pow2X2PM+QHo4pi/YBJV+bBn0OFNAB0qiV4N4wYRZ9uMzU5kurO1CieTWCXS0EdIAEFwwzjY+G9LPKiu5Dc+EznfUxNejnLwE29HwMu4oI6ADd0276Y/ZxHo4w+DF7nn9Ir6ubR0gAihhHxC0nB09AB+ie589/HCbCTYxaJQYzCNI+PYzjKtz4ulYJYOQGu6WagA6Q3mLoi5Uk5LnZYQyCZsowKM8dV8CYx1nVyB7pEdABuiWcr8gWUYMYBB0pwyCPK+8bMFb7Y+vqEtABuvVOCdYKE6FFrVaJLJ1YGG6wx1W4UejmFzDG69LoHuMR0AG6o719M1py83OltX3wIf2scvMLGI/ZmJ47F9ABEoUaJdgoSNgiKi9hdkKL9DiE42quDMAIrkuj3f1FQAfojvb2zUN6XWnJzcHX586t2j6a42p588v7CQz5uvR8zNclAR2gG3Pt7VuHibPmy0wlenU0xuf7Cj+uRj3zBIze87GvhyKgA3TjjRK0wj7OPdbeTabRhvRZpUMFGJ6j2GE3agI6QDdmStBKkAgtbPtCevrP71gX3+HvY+vMeQoY2HWpiHOWgA7QvivbUXUS0j03m24QZFG4MuhQAYagLum6JKADtO+1EgjpwjkDOq7mqgFkKtxELGpnFwEdoF3zEp6P6ilMXAsTwjmdhHQruwM5Gv2K7QI6QPcsvNR9SP+90pYrnNP2caVDBcgtnO+X+MiggA7Q4sWklAVMeg4TFo5r1yvhHNuvAZl5Xuo2nwI6QHs8e54wpDevMJM+U42NhRsdR3E1b1huv+ZmDdC3o5IfFxTQAdoLO7alSh8oQpgw67e+eXXTOjhTCu4J6Y4poM9wXvS1SUAHaMfr0hYxyShQhBsjnp9dXd28fi+1dZCVj6mZSgCJnbhxLKADtMHsef+BIoTOX5vXlWr8cPCz72YSKxxTR0I6kNAs3hwsnoAO0E7oEXj6DxThufSwXVRoz/V+fO/r6vcGPwjpQKbh3PoXAjpAK+basbILFSGEhgXkzKbf3KgIq7RraUdIB4RzAR1g9CymlGeomMfZ9PBs+rzQMoQbFL9bpR0hHRDOBXSAEtTNhcUsbd7BIrxH4dn0MAAope29rm5WaA97yM59ChDSAeFcQAcogQvLcMJFCBYhqL8acVBfBvP9kvePRUgHhHMBHaA8r8xODi5chEXkzprXv6ubmytjef+uBHOEdEA4F9ABShWCndWwhx0yZrH1fb8a5mJyy639fo2t7II5QjognI/AT+v+hs87T6fNl/dKBxTMTOXINNe23ebLYfN60bz2Mg7l4WbCO2sfkMlxcxmPG4AfObLrjYAO0IWL5gJj5fZxh45J8yVc6/6IX3d7/HHmMZR/EMrJ9Hg5br6cqwQgnAvoAH2EpbBt1UIpigogezGoP2teIbx3OcNeN6+wX/mf1c0uAXPvAAM4Rg6bL5cqAQjnAjpASiGcXysD8Vq4G8P6v+6E9r3q/ln3efVtYbpFDOHLUD4XxhlBSD+v+u04AfIRrnP7xk0COkBXwqrtZ8oA8OAYcS+OEYV0EM6F8w1ZxR3gx2rhHOBxcTAedkYwKIdyheP/V+FcQAfoSrgL/FwZAIR04FFhMdN9a/UI6ABdeu5CA7BWSF80r98re6VDScIe58ZMAjpAp07sdw6wcVA/CudRlYDRO4rHOwI6QGfCneALZQDYKqSH82h4TMisGozPcjG4mVII6ABdunYnGKC1kP71udTKc+kwqrFSdbP9bK0UAjpA1xecfWUAaDWkL8+tV6oBgzerbmbO50ohoAN0KbRqHVngBKCTkB4Wjwvt7p5Lh+H6+ry5sZKADpAinO/btxOg86AenkvfrzyXDkMyr25a2mdKIaADCOcA4wrpdfPl1+ZVqwZk7yqGc+MkAR0giRMXHYDkIT20vIeZ9FeqAVmPkexvLqADJHOkXQug16B+1nz5vbppoQXysFyl3ZazAjqAcA5QWEi/jiHdKu/Qv6/rROguFNABUlkI5wDZhfTlKu/PKwvIQV/jo9DOfqKlXUAHSHnx2RfOAbIN6mEW3QJykNbX4y4efwjoAEnDuZYtgLxD+nIBuZPKbDp0PTZ6biE4AR0gtWvhHGBwQT08CxueTa9VA1pn1jxDPysBUFA4d2cYYHghfR7O4Z93nh40Xy+b166qwFaWa/EI5hkygw6M3Uw4BxhFUF8+mz5TDdhY6Eoxa56xn9b9DZ93nk6bL++VDhiAV3F/XQBGJI5Hw2z6RDVgJaGbMKzOXitF3sygA2O0XPBEOAcYoRAymleYTX9VWUQOfjQmCsH8d+FcQAfow/J5c61bAOMP6mfVzSJyzvnwT7Pqpp39QikEdIC+LkRWagcoK6TPwxZR4fxf3dykhdLVcTx0ZA2e4bGKOzAGy/atmVIAFBvUQyj5/fPO08Pm62nl+XTKM69u1t8xHhowM+jA0H0dkLkYARCDergehLZ3z6dTikUM5r8aDwnoAH0KF6P9uEcuACxD+iI+nx4WkvP8LaMO5tXNc+ZnyjEOtlkDhig8Y3jkWXMAVhy/TqqbtvdD1WAkZtXN4326REbGDDowJLe3ChHOAVhJXEjuqLqZUZ+pCAMP5r9aAE5AB+hb2ELnd1uFACCoU3gwnyvHeGlxB3IXLkJHcXVeAGiN1ncyF2bIX4dwLpQL6AI6kMVFyaInACQI6rvNl+Pm9bJ57aoImQTzC23sArqADuQgtLG/clECoIegflDZR51+zCv7mAvoAjqQkVm8MM2VAoCew3oI6mFGfaoadCyss/Pa43wI6IBgDgCPj30n1c2Megjs2t9pyyKOf14b/yCgA4I5AKw3Bl62v4dZ9T0VYUN183qjjR0BHciFFUkBGHpYDwH9RXWz+rtZdX4kjHeWbezGPgjoQDYXp1fhAmXxNwBGFNYPYlg/UA3umDWvd82450opENCBnC5Obyx8AsDIg/qyBT6E9amKFCuE8XeVCQkEdCAj1yGUVzdt7C5OAJQW1icxrP8hrAvlIKADfZjHC1SYLb9WDgD4bmb9j0ob/FiEEF4L5QjogFAOAMMO7Ldn1icqMrgxzwfPlCOgAzkJQXx5x1goB4DNw/peDOrPKrPruVnOkn+IY565kiCgA7lcoK7iBap2gQKAzgL79FZgn6pIcvWt8U6tHPThZyUA7gnkty9QZskBIIEYCus7gX3vVmC353p75tVNV6DxDlkxgw7U8QL1Z2WGHACyFVeH37sV2veE9pUsboXx8PXaeAcBHcjp4jSPFyd3iwFg+KE9vMIY/Zdb/79UdRzn/Cf+/2urrDMkWtxhnCE8fP0zXqDmnqMCgHGKM8Hz6lZr/J3gvpxlfxb/0xjC+/Lv+uHW2GduVhwBHUhlefGtboXv2/9+YTYcAPhRcL8V4JdB/Xab/LNbvyR1+/wyaFe3wvd3YyATDpRgkxb3SfPlUOmglbD9EO1YAEA24pZwjwX23Rjq/x7LxND9YCA3uQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALC5n5QAAACA3H3eeTptvuw2r717/nPdvBZPvny6FtABAACg3UAegviL5jV9IJQ/5Kp5fWhesyawLwR0AAAA2CyYHzZfXq4Zyh8ya16vmqA+F9ABAABgtWA+bb5cNq9JB398COonuc+oC+gAAAD0GczDc+Wnzet4hV8eAvbd58wfei79vt971IT0KwEdAAAA/hnO3z8SsEOoDoH6XQjmj7Wqx2fWp9XNc+uPBfbQ8n4moAMAAMC3QB3C+e4Dwfx187rYpC09/tlhVv7ggV8SFpA7EtABAAAQzh8O5xfVzSz3ooXvM60efq49u5AuoAMAAJAynIdQ/vGe0Pz1GfH4dVU/3Ps8fr8Q0u+bTQ8z9CcCOgAAACUG9DBzPr0nnO+HsN389/9t8MeGkF43rzcPBfbmzw0h/fCe/xQWjpsJ6AAAAJQUzs+qm2fD7w3n8df8b8tvU8fQPV8xpIfv/3sOe6X/n48IAAAACcL55J5wXt0O5y2ZNq+P8Tn378Rnzmd3/vWyBb53AjoAAAAp3BfOT1oO57dD9/v7Qnr4ns1rfjfUxwXlBHQAAADGK86eH97513UTzi86/LYhpL+9+y/j6vD3rd5+KqADAAAwdveF31dr/hlh5nv/1ut5/DPqR37P5PPO08N7Qnr4PbM7/3r6wIx7Mj/7nAAAANCxu1uc1TEkr+P6nt9zFf4nhvCHniN/cU8YD15X/5zVD7/2uq8imUEHAACgM014DuF8955w3Jq4Tdrsgf88feD3XN8Txg/6rJWADgAAQJfuto0vmnB81cH3ebfB73lz558n8Xl5AR0AAIDReXbnn+uMfrb7fpapgA4AAMAY3Z1B/7Oj7/PigX8/f+g3PLDF20RABwAAYIzuPn/e+iJsn3eenlUPPz/+o+9X3/nnX/oqlFXcAQAASGmx4e970QTx6Z1/968YzCeP/L51n02fCOgAAACMSsv7ih9u8HvmcYX3QdDiDgAAQFcWPX/v50MqloAOAABAJ558+TTvMZzvP7AInIAOAAAAVffPeIc91n/dIpzPBXQAAADGaJ44oC+acL5Oa/30zj//R0AHAACghID+bMM/J7Ss/7R8Nf/86oFfd3jPau/3emARu97a4q3inrnmAxP2DNzr82Dq8bmRlHUONd5Vy2F+fpu61on/XtME3+Z6zTu/uX4GRlur5u82qXrchqVPqY+5Ls7TffwdevwcLbp4BjPR8T1mWZznE42Bsj8WR3wtyGX8+aH6fpZ6GsaJLRwDF83r5QOf4dPqn/ub32cqoLOO8ME67vH7h+c3nhdQ5/MHDs42hTt8Z4V9fsNF/32C7/NT4r/Xe8feyoP3FLXaX/EC3LbDeI4u0U89fM9Wz9PN5/NVMzDM4Zyc4nNUx+NkiOfCMevr3HX7OAih5mPPP8PvQ1vEa2jXgqbGt/9xEcNnCO2hjbtOdJOkvqdOYe/y2TZ/aAj4zd/vpPm/l/cF7+a/Ha6wxdqLnG5qaHHP37Tn738QT95A+mNvOvC/w6W3kYydmgGGrwGpby+8DUntxnyxvLHwvjkX/q95ha/HsSOgdfEmwKKL9z4G8IcC9fljWSZeB+52e171+QYJ6BmLB8heBj/KgXcDBNw1z19nVaHt3wzrGHMTmsL9YZxJFIJq6FT6qzkvfgwzzx2cH2d3v2eLN0qPHvj34e/wWDfyfd0PrwV0cj9h/eGtgF5MYtAdWjgPwfylt48hHGNxQArGmv1e6/a8FVkJ78dlDOtnLQb1+4JvK5MRcYa+fiiE39cZ0Py78Pm/e4Og7vuZfQE9b7m0/Ghzh/687KrdrEMh8DhnMBSHcZAGRcnsc6/NPU/hWn4ag/rWa2LF4Du786/DDZq2bpSePPLfLu98/ncfuDnwqu+iC+j5njTDgDynu4kGL9DfxXEwM3yxVc35gqHR6k6JcuqQdN0YwFgktr5vm09CiL77LHp49v2whRsA19XDi87dbad/X/1zMmGWw64CAnq+cjtRaXOHHs8HA1rMysJwDHXw+VYZMNbsjTb3YQjv0cdtHr+L26rdN0t92dJn4NU9NwC+G6M03+ey+udE6KJ6fAY+Gdus5etZhgFhdwz7MsNAhVn033P+AS0Mx8CF2ZXj5jp3oRSMXWxvz61rJLS5X3t3BiE80x2yyvNNskE4zza//7fqZiX528JK8kfNf79qXhtt5xnb6P/9yGf/8p7vW236d+mCGfQ8T5rhhJljq4/2I+jPXhvPf3V43grB3MJwjGHQaRaPEuTYGWmcOSzTGKg3PWeG2eq7N2S+djN1Md4J45TQov9AOD/KobVdQM9bricobe7Qf3jI9TlZC8MxBg8tGgRjDFe50eY+PHubhvQ4W71f3d81cR73ZZ+0FM5DKP9Y3b++1yzuo54NAV0QXuvGgUV0oPfwkN2CcRaGY2wDziFubwhrnLNDSJlk+uNZzX2YY5MuQnoYW4TV4y83DepxL/cQzC+r+ycRLpqf4Si3ggro+Z00c21v/zuke5egV4cZLhhnxpGxOR3QwowwphBsnDnskL52kL4V0q8eGvfEoB4Wpzt+7Nwc29gPYqj/K45PHrpxENraT3IspkXi8pP7gCDM7s+8TdCrbBaMszAcIxYGeL9bHJURyjkEf21zj9tlMbyQHp4f31/3vBl//fP47PlDnYJ7y7Dd/Lrlvwufk0Uch6w6FrmO4Tzbz5gZ9DwDcNYndW3u0LssFoyzMBwjN6kyfKQEtjxv59zePoQbCPxgfFJt0VUXd9H4tXnVa3y/6Yqf6a/buzXf4/fcbwAJ6E5KTpwwTDksGGdhOMbuMG5HBWMxhGe8LUo88CyzzSRC2CateYWW98fa3tex3Hf91+bPPRtCAQX0jGS6J6UTJ+Sp1wXjLAxHQS7bWkkYMjAdwM+455gbvNNt38Ow7Vnzel7dzKifxLC+aut8mCEPs/Fhb/N/h2A+pMeVPIMu+G7ia5u75/Kgd2F2701Pe3daGI5SLLde21cKhiwGpqFsY3YQAxaFnzfDjHr8LFzEz/HuY5/jnPYzF9DH4WBgP+vMWwa9O61Wf1arrUHeWWVhOMoyDS2b8flIMM7s3gsBfRTnzWnbgTlOENZjLpwW90zERTuG9CynNnfI5wJ4mPBcFYK5heEo0fkm+/xCZqF3KLS5j4NuOwHdSTMhq7lDXsEh1fFoYTgMNmFgBtbe/vdY0zs3eBMLbQroQ3bgZwY2FALzaYIB3tRxT+HCrJ6t1zDOTOOFt20UdN0J6MMzkD0p76PNHfJxnKD91uwh3BxrU2VgYJ4N8GfW5j4OU++jgD5EQ71DqM0d8tLZzJ6F4eA7l65/DEX8rA61+0nX1jh4H9dgFXcf2jZ+9pm3ELLwdcG4J18+tXpMWhiuV/Pm9UYZshOOidBR8lwpMM7slNXcb4R9vU+2+P2hw+63+FnY9T4K6Px44DsZ8F/hDwEdshIWjLuK25C05bSyMFxvAb15L8+UIc/QExY/at6fq4JrkHJv+DDAP8w8BG3y/VKN1Ybqa5t73Au7ZIsttyurY+4In+/j6uam+27i93G35bGJgE53F/gRDFAccJCP5YJxrQwy47O2h8oK9wqt7telhoe29zde4VyUewjKzsDb22+Plc2+tnPMhvH6WfO5mDVf31ZpV/YPx/CVd+HHPIPevzGsUOm5EshLmwvGWbEaHhbCj8UTydnUWJl7gvq8uumAuU74bfdUXkDP3kD3pLyP1dwhP1sH6+YcdeyCCj8OQPFYAWO0joKdVcA7CelhNv2oeaXqgn2m6gL6EBz4ewAdhoaNj83YFnmqjLCS8wTbHIKxJm2H9DCD/jrRt5uouIA+BKnuanZ+Z2ybIAB0Gho2XQQmzMBbGA5WZ+s1shLHZik+kylmYLW5d+ci0XsooAvo2Z80wwlzmuikmeLOmDZ3yE+4GK7demthONhImEHXdUJOUo3NXqU4vrS5dyO2ulu8TUCnSteqc5XooDODDnk63WBQY2E42MxxotXGIbexZm2sOWgfUnwT50cBPXep7mp+iM+XdN26sqvNHbK18irTFoaDrb3V6k7f4poIKT6Hy20G3yX4XtrcuzNXAgG99JNmyj0pr+587ZI2d8jTSgvGWRgOWmHrNXKQKsy+SzjO1OaOgE5nUoXzOj5XcvsEOoa/F7C+VRaMszActHQ9bI63Q2WggLHm12AeZ9HnxpqDNVcCAb10qfYBvB3K6wTfT5s75GtSPbJgnIXhoHXnZvvoQ2xvT/HZW8THKL8L6x3T5t7dGAEBvWjJZtCX/yfhCo3a3CFfjy0YZ2E4aJdWd/qSKsTeHVem6NbU5t7d+SqFuVL/2M9KkFbCPSnnd+5qBh8S3BwIf/6RdxqyFQLD/p3zkoXh8hXWD/hfBj/Hq+aacubt2Oj9O1M7Eks1EfRdIG8+53XzeV8kGOeGv9+Ft7lVSbp746MQ/IAZ9PRSzTBfrfjv2qbNHfIPDNNb4dzCcNCt09hyDJ2Ls8uTRN+uXvHftU2be/tSjN0Xyiygl3wABP/YzzDetbpO8L21uUPebrfdWhgOEhxztl5jZOPM2wsR36bNfWDiTfsU9bxWbQE91wMgyQW6OWk+NFtej+jiAGxmEtpuLQwHyYQZdJ0qpJB6e7W7rhJ9f2PN9qRag0ZAF9Cz1Gd7+9KbBN9fmzvk72VlYThI6fj24yXQtjirnOpxinvHmnFWPUUQ0+bezmfmMuFn5k8VF9Bz1MuiHXdOnOGkmeIZEG3ukLfdysJwkNpbre6MYJw5/8FiXykmg7S5txPODxN+y1rVBfTcDoJUe1KucgCkaD8ygw4A37P1Gl3KoVMzZRAz1twsk4TH3N4mDufXVnAX0HP0IqMDIMUCHtrcAeCeUBG3NoQ2Q1e4+TNN9O0+PPYfY7dmijCmzX29UH4QZ83/qtLf3HjjXVidfdATXpATfZ+6pV/ThnAn98pbDwDfCVuvXZlRYoDjzMUjCxHfFn5N1zeivra5F3IchS1S/zfgn18eWIMZ9AQSt7f/8A5VXMAjRUg3gw6bm43g7+CCDPcLs51vlYEWpWpvX3X8+CHRz2OsOYDxjJuRAnqOpom+zyK2Fa1Cmzvk7U017AVVwo3AE28jPCjM/p0pA9uK7e29L0R8W5xlT7Eo8TOfgEGMZxDQs5PqGZmrjn7tNqzmDpsbcsB97Y45/FDYG/03ZWBLKSdD6o5+7cZ/dzsjZK1uxgK1MgjoWUm8J+XK7URx4Jxi8GwGHTYUO2IuBvijhy14zryDDPGzO/JwxTilmkVedyXud46h4umkE9CzlPKkcdXxr9+ENnfYzqueQsM2jrxtDDigG1BirNlO4NatWbaLNR69RUBPKlV7ex0Xf+vyROvECYnF43pIgeFKOxsDP+ZC14rPMIMQJ0FStXhfrXkshetXioCmzT0/8+pmggEBPbuTZjhZpGpvXztsx0F0igU8zKDDdoHhaiCBIZxPzJ4zBkeJro+wrVSTIIsNZ0NTLRBmrJnZOXSDiUME9NGdLDYdvGtzh+EEhty9ckFmDOJztm42Yay5/XixTvTz6dbMx4lOOgE9Z6lOFvMtnvH4MLJawJgDQ87tYtexNRjGcsxdVemeoYW1fd55Oq3Stbe/2/A4CuPTeYKfT5t7HmbGAgJ6zifNlHtSXvX0e9c6cfpUwNYuqnwXjLOwFmN0VA1vkUbKkXLyo+7p9xprDkdYD0vnkYCetZQniY1nwWM7aooTpzZ32FLGC8bNtLMx4mPOgJPSx5r1lo8vWZR4/EKnxHNlENBzl+wkEdvwtuHECcMJDLktGDe0VeZh3WMuHG9WIyYrn3eehkWIJ4m+3bstj6Fk3Zra3Hsxa1771qAR0Idgmuj7XGXyZ6x04vSxgFbkNKNnYThKCOlnVZrtomBVLxJ+L2NNHhL2Ordiu4Cev8R7Um49+x0Xn5on+Fm1uUM7YSEcrznM6FkYjpLYeo2cpBpPzeM1p/fx6op0a6YRzoXPm8+GDroO/KwEgz851C39OeHO5nGi2lgVF7YXgnGYQZn0+DO4MHfvOpM6z0t/I8Jq1J93noYbY+c+lvQpcXt7W2O2OtHP+7XN3Yxu59njqKUbNwjoyaS6q3nd4sHxLlFAD7Wx4A5sHxYWzSAkBLe3fd0gsDBcEgt1zuq4u2iOu3Cjeaoa9Cjl5+9DS8fOvDl2wg3HvURjzZmPSfvXo+pmj3O1FdCHJXF7+6T5fu8HVqLQ5r63xb7twLcBz1VzPNU9hIVwkbZoFqUKKxX/lfBaD3elfP78ZXOdednWGDDRz/yHgN4ZXbAC+iA9Sxl2q2HexQ8XFgEd2hE6Uj4mDgsn2gcpVexeCcfdW9UgteazN6nSzEIvDXGcqc29u9wRum3PlKJbFonr4KSgBGoECcPCvPnyOuG3rLW34bj7um2U4wBjKHUqzWm8SYSAPgyJF+0YskmsFdBOWDir0i3iZWE4+HYszJWBxF4owUqs5t5hSFeCbmlxd9Lss1ba3KE9oeW26zUpLqwfATdutbq/Vw1SCG3bVdr29iEbW5v7vHm9+cGv+a1K0zlw2NT2jQVMBfTBnAyUYK1amYmD9sJC3Vwwrzo8D1kYDu4/7sJxYUYJ48w86zUbS0CP3XIPijdwplWaNWnCOU9A74gW95Zob1+bNndo30kM0p382RbcgXtDehg06ywhBW3b6vXYuShco1OtSTONO1choGfNh3R9HgmAdi/O844uzhaGg8eFVnc3sOhMnB011lxzbB7rVpKLhOeicx8xAT137mpucOJUAmg9pJ9V7S9c5XEUePy4CzPoHgHBmEnd+j4XLRJes0M37LGPmICepR72pBwLbe7QjaMW/6xXFoaDlQbGYebqSiXoiIkgdVv1XDSr0u0wcVpgl4KAPhDuam5Omzu0f3GuWwoK4QJ/oaKwMq3udGWqBJuN0QsNkKk6ekJtzaK3zCruQmbvJ86qnPbZX5qLRA4X2GuLfRXhpNp+NVcLw8Eabm299lY1aEtcjMss5XZjzVlh56JZ87l5UaW5sRNm0WdxHRwE9CxOmpNKe/s2vra5F9JCexhffduvbI1RwsV53hxbYcG4Tbd/CgvDadfN4xx5luHPNbdw4IPH3lXznoXOE7NKtEV7+/b1K/F89apK13kRFox77qMmoOdiqgRbC3f4POMK7QeFs3gHfbLBbz9SwTwCepXnHtt1oQPedQbGB5XtV2mHRym3rF9ocy+tIyw87tb8vetEWSXUeBofsWNLnkHfnruaLjyQs02C9iutarDVwDgEAbNJbE17u7FmD2OATZ36mAnoOZw07UnZDqu5Q3dBoa7WWzAuBHMLw8H2x56t12jDMyVoRZETavFm+yzRt5s24/lDHzUBvW/CeXsstAfdWWdlaQvDQXuD47PKI1wYa2ZRx4K3A0t5o9AsuoDeO+3tLkAwhJCwWPECbWE4aF9odXfTi7XF7sKJSrRmWugYYJ4wpOe6sKmALlSy4QGtzR26u0CHtvUfzeRZGA6GPThmXHQXtqvkibUwBkh1o/Blwd0KAnqf4qIduBDBkJw88t8sDAfdhfQwONadwrqMNdWzrXNQCOevE327EM61ugvovdDe7sQJQ7tA19X9i8XM47OyQHfWWQuCwmlv7yY4Fj7BFm4UzhN9r+Om1j6/ArowOQLa3KF7J/eEBK3t0LE4g+VYwzizX8VOsK2xHk1bzn3cNvOzEqwv8Z6Ui+aA+ncGf+fL5sthgm8V2tyteAsdXqCb4/mk+vZIyXWcWQe6P/6umuMvzGIdqwYZBcmj5rM563mcGSZoPib4VmEMX+yNsvA+N7UO7eeTFLVuvtfUGGN9ZtDzP2nm8szau0Tfxx1jSHCBbl778XWiIpBUmMFyI5rHwmoITyk7CnsPUM21KBwT8wTfatc6UlXK675n0QX0ZKYJv9eHTAb04UZBimfntLkDMFpa3VlBygB5ndECoakmpYpeRyqO6etUmakZ1x86pAX0TvWwaEdOq76m+lms5g7AmAfIYbbQ1mvkMA56l9Hf+02i76NbM+35xyy6gD6qk2Yd77TnQps7ALQT0s+qDFqLyUsP7e1XGR0T2tzT1bpO+N6H7tgzR7eAPpbw+C6zg1mbOwC0x9Zr3DVN+L3mMRTnRJt7OimfRX/ZjO13lVxAb13h7e2pfyZt7gCMWnz210KN9BUc6wz//trc055/Zom+XQjnWt0F9MGHxnlGi3bcps0dANobJIcB8pVKEGcYi+3UjMeDNve0wrPoqbp4juMjHAjorZom/F5ZXqy1uQNA67S6UyUO58sxXY60uaf7DMybL68Tfstzh7mA3poeFu14l3E5tLkDQHuD5BDOn6tE8VIGxpy7NrS5p3VRpbtBeNBkqqmSC+hDPIgXcXXFXKW6eeAABqCUkF7HgTLGmil8yPhY0Oaett4hnKecRfcsuoDempSzubk/i1Yn+j57nlUBoCDhedBrZShPD0Ex97GmNve0If2sSnNTJJg2n/dDVRfQtz1phpCYsr39Q+YH8SLhiVP7EQClDJLD9fVIJYqUMiheZ7oQ8W3a3NN7lfB7mUUX0Ad38A5hNddUbe6eQwegpJB+nXigTHljzXogx8E8wbfS5v6t5rMq3Sx6WAz6TNXv97MSrByYU7WcLeId9CHUZD6i9zjsQ7tbyOf5OvH32h9hDfdH9j6p1WZmQxjodnWtGul5Oovrb2g3bQav9dj+XgM43vqsU8pFAodyfXmeaGw299n87po9GfF1BAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAwfl/AQYA4kOnj7RLU2oAAAAASUVORK5CYII=">
+        <span class="divider"></span>
+        <span class="eyebrow">CRM · Leads x Asesor</span>
+      </div>
+      <h1>Leads x Asesor</h1>
+      <p>Datos de Bitrix24 (todos los pipelines), año 2026 · actualizado el 8 de septiembre de 2026, 16:12 (Ecuador) · el mes en curso aparece parcial.</p>
+    </div>
+    <div class="theme-toggle" id="theme-toggle">
+      <button data-mode="light" onclick="setTheme('light')">Claro</button>
+      <button data-mode="dark" onclick="setTheme('dark')">Oscuro</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="card filterbar">
+    <span class="fb-label">Pipeline</span>
+    <div class="combo" id="combo-pipeline">
+      <button class="combo-btn" onclick="toggleCombo('combo-pipeline')"><span id="lbl-pipeline">Todos</span> <span class="car">▾</span></button>
+      <div class="combo-panel" id="panel-pipeline"></div>
+    </div>
+
+    <span class="fb-label">Asesor</span>
+    <div class="combo" id="combo-advisor">
+      <button class="combo-btn" onclick="toggleCombo('combo-advisor')"><span id="lbl-advisor">Todos</span> <span class="car">▾</span></button>
+      <div class="combo-panel" id="panel-advisor"></div>
+    </div>
+
+    <span class="fb-label">Mes (2026)</span>
+    <div class="combo" id="combo-month">
+      <button class="combo-btn" onclick="toggleCombo('combo-month')"><span id="lbl-month">Todos</span> <span class="car">▾</span></button>
+      <div class="combo-panel" id="panel-month"></div>
+    </div>
+
+    <button class="reset-btn" onclick="resetFilters()">Restablecer</button>
+    <button class="dl-btn" id="btn-download" onclick="downloadReport()" title="Genera un PDF del panel con los filtros actuales">⬇ Descargar reporte (PDF)</button>
+    <span class="fb-summary" id="fb-summary"></span>
+  </div>
+
+  <div id="print-head" class="print-only"></div>
+
+  <div class="section-title" style="margin-top:4px;">Panorama general</div>
+  <div class="section-sub">Fijo a BIO BALANCEADOS + BIOEQUINOS + LEADS + MASCOTAS — no cambia con Pipeline ni Asesor, solo con Mes</div>
+  <div class="kpi-grid">
+    <div class="kpi" style="--accent:var(--brand-red)">
+      <div class="label">Total general de leads</div>
+      <div class="value" id="kpi-total-fixed">—</div>
+      <div class="sub">Llegaron a la conversación</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-asignado)">
+      <div class="label">Asignado (en negociación)</div>
+      <div class="value" id="kpi-fixed-asignado">—</div>
+      <div class="sub" id="kpi-fixed-asignado-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-cerrado)">
+      <div class="label">Cerrado (compra)</div>
+      <div class="value" id="kpi-fixed-cerrado">—</div>
+      <div class="sub" id="kpi-fixed-cerrado-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--brand-red)">
+      <div class="label">% Conversión</div>
+      <div class="value" id="kpi-fixed-conv">—</div>
+      <div class="sub" id="kpi-fixed-valor">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-cerrado)">
+      <div class="label">Redirigidos a un asesor</div>
+      <div class="value" id="kpi-redirected">—</div>
+      <div class="sub" id="kpi-redirected-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-descartado)">
+      <div class="label">Sin redirigir (bot)</div>
+      <div class="value" id="kpi-unredirected">—</div>
+      <div class="sub" id="kpi-unredirected-pct">—</div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:22px;">Según filtros seleccionados</div>
+  <div class="section-sub">Cambia con Pipeline, Asesor y Mes — usa esto para ver el detalle de un asesor en particular</div>
+  <div class="kpi-grid">
+    <div class="kpi" style="--accent:var(--brand-red)">
+      <div class="label">Total (filtrado)</div>
+      <div class="value" id="kpi-total">—</div>
+      <div class="sub">Llegaron a la conversación</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-asignado)">
+      <div class="label"><span class="dot" style="background:var(--series-asignado)"></span>Asignado</div>
+      <div class="value" id="kpi-asignado">—</div>
+      <div class="sub" id="kpi-asignado-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-negado)">
+      <div class="label"><span class="dot" style="background:var(--series-negado)"></span>Negó</div>
+      <div class="value" id="kpi-negado">—</div>
+      <div class="sub" id="kpi-negado-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-cerrado)">
+      <div class="label"><span class="dot" style="background:var(--series-cerrado)"></span>Cerrado (compra)</div>
+      <div class="value" id="kpi-cerrado">—</div>
+      <div class="sub" id="kpi-cerrado-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--series-descartado)">
+      <div class="label"><span class="dot" style="background:var(--series-descartado)"></span>Descartados</div>
+      <div class="value" id="kpi-descartado">—</div>
+      <div class="sub" id="kpi-descartado-pct">—</div>
+    </div>
+    <div class="kpi" style="--accent:var(--brand-red)">
+      <div class="label">% Conversión</div>
+      <div class="value" id="kpi-conv">—</div>
+      <div class="sub" id="kpi-valor">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Leads por asesor</div>
+    <div class="section-sub">Composición por estado, ordenado por volumen total</div>
+    <div id="chart-advisor"></div>
+    <div class="legend" id="legend-advisor"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="section-title">Evolución mensual 2026</div>
+      <div class="section-sub">Total de prospectos vs. cerrados (compras)</div>
+      <div id="chart-trend"></div>
+      <div class="legend" id="legend-trend"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">% Conversión</div>
+      <div class="section-sub" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span id="conv-sub-label">Cerrado / Total, solo asesores con actividad</span>
+        <div class="view-toggle" id="conv-toggle">
+          <button data-view="advisor" class="active" onclick="setConvView('advisor')">Por asesor</button>
+          <button data-view="month" onclick="setConvView('month')">Por mes</button>
+        </div>
+      </div>
+      <div id="chart-conv"></div>
+      <div class="legend" id="legend-conv"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="section-title">Distribución por pipeline</div>
+    <div class="section-sub">Volumen total de registros por pipeline de Bitrix24</div>
+    <div id="chart-pipeline"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="section-title">Embudo</div>
+    <div class="section-sub">Todos los leads → Asignados (pipeline LEADS) → Cerrados (suma de BIO BALANCEADOS + MASCOTAS + BIOEQUINOS) — fijo a todos los asesores, solo cambia con Mes</div>
+    <div id="funnel-pipelines" class="funnel"></div>
+  </div>
+
+  <button class="table-toggle" id="table-toggle" onclick="toggleTable()">Ver tabla de datos ▾</button>
+  <div id="table-wrap" style="display:none;"></div>
+
+  <div class="card glossary">
+    <b>Panorama general vs. filtros</b> — las tarjetas de arriba están fijas a los 4 pipelines de venta real
+    (<b>BIO BALANCEADOS, BIOEQUINOS, LEADS, MASCOTAS</b>) y a todos los asesores; no cambian con los filtros de Pipeline
+    ni Asesor de la barra de arriba — solo con el de Mes. Sirven para comparar "cuánto le toca a Jessy" contra el total
+    real de esos 4 pipelines. Las tarjetas de abajo ("Según filtros seleccionados") sí cambian con todos los filtros
+    (Pipeline, Asesor y Mes).<br><br>
+    <b>Redirigidos vs. Sin redirigir</b> — “Bioalimentar Digital” es la cuenta automática que recibe los leads entrantes
+    por formularios/campañas antes de que alguien los reparta a mano. <b>Redirigidos</b> = ya están a nombre de un asesor
+    humano. <b>Sin redirigir</b> = siguen a nombre de “Bioalimentar Digital”, todavía no se le asignaron a nadie.<br><br>
+    <b>Cómo se clasifica cada registro en los 4 estados (Asignado/Negó/Cerrado/Descartado)</b> — se usa la convención de
+    etapas de Bitrix24: la etapa <b>“Ganado” (WON)</b> de cada pipeline cuenta como <b>Cerrado</b> (ya compraron); la etapa
+    <b>“Perdido” (LOSE)</b> cuenta como <b>Negó</b>; la etapa <b>“Analizar la falla” (APOLOGY)</b> cuenta como
+    <b>Descartado</b>; cualquier otra etapa (incluye “Lead No Calificado”, negociación, gestión, etc.) cuenta como
+    <b>Asignado</b> — en gestión, aún sin resolver. El <b>Total</b> es la suma de todos los registros creados en el período
+    filtrado. La <b>% Conversión</b> es Cerrado ÷ Total.
+  </div>
+
+  <div class="footnote">Fuente: Bitrix24 (crm.deal), todos los pipelines, filtrado a registros creados en 2026. Datos extraídos el 22 de julio de 2026.</div>
+</div>
+</div>
+
+<div id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+const DATA = [{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-01","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":11,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-02","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":4,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":9,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-04","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":10,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-04","stage_code":"NEW","stage_name":"Con los Huevos en la Cancha","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_21IJ4Q","stage_name":"UC_21IJ4Q","bucket":"asignado","count":58,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"NEW","stage_name":"Con los Huevos en la Cancha","bucket":"asignado","count":2725,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_71XQIH","stage_name":"UC_71XQIH","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_XY0O1A","stage_name":"UC_XY0O1A","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"EXECUTING","stage_name":"Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_58UEV8","stage_name":"Ganador Contactado","bucket":"asignado","count":4,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_W75R78","stage_name":"Reclamos","bucket":"asignado","count":19,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-06","stage_code":"UC_W75R78","stage_name":"Reclamos","bucket":"asignado","count":7,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-06","stage_code":"UC_21IJ4Q","stage_name":"UC_21IJ4Q","bucket":"asignado","count":49,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-06","stage_code":"NEW","stage_name":"Con los Huevos en la Cancha","bucket":"asignado","count":2704,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-06","stage_code":"UC_58UEV8","stage_name":"Ganador Contactado","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-06","stage_code":"UC_71XQIH","stage_name":"UC_71XQIH","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-07","stage_code":"NEW","stage_name":"Con los Huevos en la Cancha","bucket":"asignado","count":12,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-07","stage_code":"UC_71XQIH","stage_name":"UC_71XQIH","bucket":"asignado","count":382,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-07","stage_code":"EXECUTING","stage_name":"Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-07","stage_code":"UC_21IJ4Q","stage_name":"UC_21IJ4Q","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-07","stage_code":"UC_CIAC7H","stage_name":"Burguer Show","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-08","stage_code":"UC_21IJ4Q","stage_name":"UC_21IJ4Q","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-08","stage_code":"UC_CIAC7H","stage_name":"Burguer Show","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-09","stage_code":"UC_XY0O1A","stage_name":"UC_XY0O1A","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-09","stage_code":"UC_TCNMAG","stage_name":"UC_TCNMAG","bucket":"asignado","count":18,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"45","category_name":"BIO HUEVOS","month":"2026-09","stage_code":"UC_21IJ4Q","stage_name":"UC_21IJ4Q","bucket":"asignado","count":192,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-06","stage_code":"EXECUTING","stage_name":"PasantÃ­as/Tesis","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-08","stage_code":"UC_RDC0FW","stage_name":"UC_RDC0FW","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-08","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-08","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-09","stage_code":"UC_RDC0FW","stage_name":"UC_RDC0FW","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"UC_M7I0KU","stage_name":"Asignado a Distribuidor","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"WON","stage_name":"NegociaciÃ³n Ganada","bucket":"cerrado","count":1,"opportunity_sum":46.3},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"39","category_name":"CLIENTES LIBRA","month":"2026-03","stage_code":"EXECUTING","stage_name":"Clientes Actualizados","bucket":"asignado","count":278,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"39","category_name":"CLIENTES LIBRA","month":"2026-03","stage_code":"PREPARATION","stage_name":"Clientes Mascotas","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"39","category_name":"CLIENTES LIBRA","month":"2026-03","stage_code":"NEW","stage_name":"Clientes Pecuario","bucket":"asignado","count":357,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"33","category_name":"Comentarios","month":"2026-08","stage_code":"PREPARATION","stage_name":"Crear Documentos","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"33","category_name":"Comentarios","month":"2026-09","stage_code":"PREPARATION","stage_name":"Crear Documentos","bucket":"asignado","count":4,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"41","category_name":"DISTRIBUIDORES","month":"2026-06","stage_code":"UC_4FJV9X","stage_name":"Asesores Comerciales (Bio)","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"41","category_name":"DISTRIBUIDORES","month":"2026-08","stage_code":"NEW","stage_name":"Asesores Comerciales (Dis)","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"15","category_name":"LEADS","month":"2026-06","stage_code":"NEW","stage_name":"Lead (prospecto)","bucket":"asignado","count":679,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"15","category_name":"LEADS","month":"2026-07","stage_code":"NEW","stage_name":"Lead (prospecto)","bucket":"asignado","count":1794,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"15","category_name":"LEADS","month":"2026-07","stage_code":"UC_ZBPZJ1","stage_name":"Burguer Show","bucket":"asignado","count":1485,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"15","category_name":"LEADS","month":"2026-08","stage_code":"NEW","stage_name":"Lead (prospecto)","bucket":"asignado","count":798,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"15","category_name":"LEADS","month":"2026-08","stage_code":"WON","stage_name":"ConversiÃ³n PV/BAAS","bucket":"cerrado","count":1,"opportunity_sum":67.87},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"15","category_name":"LEADS","month":"2026-09","stage_code":"NEW","stage_name":"Lead (prospecto)","bucket":"asignado","count":320,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-01","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":432,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":260,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":140,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"UC_482EN6","stage_name":"NegociaciÃ³n","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-04","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":4,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-04","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":113,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-05","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":86,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-05","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"1","advisor_name":"Bioalimentar Digital","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"53515","advisor_name":"Christian Jacome","category_id":"39","category_name":"CLIENTES LIBRA","month":"2026-03","stage_code":"NEW","stage_name":"Clientes Pecuario","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"49459","advisor_name":"DANIELA SEVILLA","category_id":"35","category_name":"MASCOTAS","month":"2026-01","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"49459","advisor_name":"DANIELA SEVILLA","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"123","advisor_name":"Erick Tohaza","category_id":"31","category_name":"IXINA","month":"2026-01","stage_code":"NEW","stage_name":"Prospecto","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-01","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":538,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-01","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":16,"opportunity_sum":44591.819999999992},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-02","stage_code":"UC_Y7A4D5","stage_name":"Apertura Cliente","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-02","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":436,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-02","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":11,"opportunity_sum":15991.119999999999},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"UC_N62RU8","stage_name":"LNC x Datos","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":283,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":23,"opportunity_sum":72226.069999999992},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-04","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":307,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-04","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":9,"opportunity_sum":17815.33},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"UC_78KBLT","stage_name":"DocumentaciÃ³n","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"UC_F84LPS","stage_name":"NegociaciÃ³n Asesor Comercial","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":492,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":39,"opportunity_sum":73423.13},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-06","stage_code":"UC_F84LPS","stage_name":"NegociaciÃ³n Asesor Comercial","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-06","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-06","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":359,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-06","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":18,"opportunity_sum":27349.940000000002},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":137,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"UC_F84LPS","stage_name":"NegociaciÃ³n Asesor Comercial","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":36,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"PREPARATION","stage_name":"GestiÃ³n Lead","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":21,"opportunity_sum":27295.04},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":211,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"UC_78KBLT","stage_name":"DocumentaciÃ³n","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"UC_F84LPS","stage_name":"NegociaciÃ³n Asesor Comercial","bucket":"asignado","count":14,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"UC_AJP7PG","stage_name":"Visita Programada Asesor","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":104,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":14,"opportunity_sum":30542.550000000003},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-09","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":14,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-09","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-09","stage_code":"PREPARATION","stage_name":"GestiÃ³n Lead","bucket":"asignado","count":56,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-09","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":5,"opportunity_sum":15782.710000000001},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"45","category_name":"BIO HUEVOS","month":"2026-01","stage_code":"EXECUTING","stage_name":"Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"45","category_name":"BIO HUEVOS","month":"2026-04","stage_code":"EXECUTING","stage_name":"Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"45","category_name":"BIO HUEVOS","month":"2026-08","stage_code":"EXECUTING","stage_name":"Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-01","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-02","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-03","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":8,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-04","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-05","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-06","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":17,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":18,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"UC_KOZRMS","stage_name":"UC_KOZRMS","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":47,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":41,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"WON","stage_name":"NegociaciÃ³n Ganada","bucket":"cerrado","count":1,"opportunity_sum":46.3},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":43,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":23,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"UC_KOZRMS","stage_name":"UC_KOZRMS","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":27,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"47","category_name":"BIOEQUINOS","month":"2026-09","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"33","category_name":"Comentarios","month":"2026-08","stage_code":"PREPARATION","stage_name":"Crear Documentos","bucket":"asignado","count":135,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"33","category_name":"Comentarios","month":"2026-09","stage_code":"PREPARATION","stage_name":"Crear Documentos","bucket":"asignado","count":12,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"41","category_name":"DISTRIBUIDORES","month":"2026-03","stage_code":"NEW","stage_name":"Asesores Comerciales (Dis)","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"15","category_name":"LEADS","month":"2026-05","stage_code":"UC_9O9AVY","stage_name":"Concurso Arma tu Manada","bucket":"asignado","count":33,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"15","category_name":"LEADS","month":"2026-06","stage_code":"UC_9O9AVY","stage_name":"Concurso Arma tu Manada","bucket":"asignado","count":9,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-01","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":84,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":153,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"UC_482EN6","stage_name":"NegociaciÃ³n","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":81,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-04","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":103,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-05","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":44,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-06","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":14,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"67","advisor_name":"JESSICA TAPIA","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"PREPAYMENT_INVOIC","stage_name":"AsignaciÃ³n Distribuidor","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-01","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":319,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-01","stage_code":"UC_N62RU8","stage_name":"LNC x Datos","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-02","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":233,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":142,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-03","stage_code":"UC_N62RU8","stage_name":"LNC x Datos","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-04","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":164,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"UC_F84LPS","stage_name":"NegociaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-05","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":274,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-06","stage_code":"UC_F84LPS","stage_name":"NegociaciÃ³n Asesor Comercial","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-06","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":53,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":12,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-07","stage_code":"EXECUTING","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":7,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"0","category_name":"BIO BALANCEADOS","month":"2026-08","stage_code":"UC_XW1HAN","stage_name":"Lead No Calificado","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_58UEV8","stage_name":"Ganador Contactado","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"45","category_name":"BIO HUEVOS","month":"2026-05","stage_code":"UC_W75R78","stage_name":"Reclamos","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"45","category_name":"BIO HUEVOS","month":"2026-06","stage_code":"UC_IWIML8","stage_name":"LNQ","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"45","category_name":"BIO HUEVOS","month":"2026-08","stage_code":"UC_PKEKPA","stage_name":"UC_PKEKPA","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-01","stage_code":"UC_BFN16P","stage_name":"Quejas y Reclamos","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-01","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-02","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-02","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-02","stage_code":"UC_1ZCA8V","stage_name":"Comentarios","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-03","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":10,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-03","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-04","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":18,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-04","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-04","stage_code":"NEW","stage_name":"Lead","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-05","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-05","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-06","stage_code":"PREPARATION","stage_name":"Solicitud de Trabajo","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-06","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":7,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-06","stage_code":"FINAL_INVOICE","stage_name":"Visitas Planta","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"PREPAYMENT_INVOIC","stage_name":"Proveedores","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"EXECUTING","stage_name":"PasantÃ­as/Tesis","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-07","stage_code":"NEW","stage_name":"Lead","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"27","category_name":"BiOALiMENTAR","month":"2026-08","stage_code":"UC_RDC0FW","stage_name":"UC_RDC0FW","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":4,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"UC_M7I0KU","stage_name":"Asignado a Distribuidor","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-06","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":15,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"UC_Y03U4B","stage_name":"UC_Y03U4B","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":19,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":19,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":9,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-07","stage_code":"UC_KOZRMS","stage_name":"UC_KOZRMS","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"UC_TCU9Q1","stage_name":"LNQ","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":23,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"UC_KOZRMS","stage_name":"UC_KOZRMS","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"PREPARATION","stage_name":"Asignado Asesor Comercial","bucket":"asignado","count":23,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-08","stage_code":"UC_M7I0KU","stage_name":"Asignado a Distribuidor","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"47","category_name":"BIOEQUINOS","month":"2026-09","stage_code":"NEW","stage_name":"Leads","bucket":"asignado","count":6,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"33","category_name":"Comentarios","month":"2026-08","stage_code":"PREPARATION","stage_name":"Crear Documentos","bucket":"asignado","count":288,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"33","category_name":"Comentarios","month":"2026-09","stage_code":"PREPARATION","stage_name":"Crear Documentos","bucket":"asignado","count":39,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"15","category_name":"LEADS","month":"2026-05","stage_code":"UC_9O9AVY","stage_name":"Concurso Arma tu Manada","bucket":"asignado","count":32,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"15","category_name":"LEADS","month":"2026-06","stage_code":"UC_9O9AVY","stage_name":"Concurso Arma tu Manada","bucket":"asignado","count":11,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"15","category_name":"LEADS","month":"2026-07","stage_code":"NEW","stage_name":"Lead (prospecto)","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"15","category_name":"LEADS","month":"2026-08","stage_code":"NEW","stage_name":"Lead (prospecto)","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-01","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":91,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-01","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":40,"opportunity_sum":7365.44},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":145,"opportunity_sum":64.6},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"UC_482EN6","stage_name":"NegociaciÃ³n","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-02","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":38,"opportunity_sum":30958.71},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":103,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-03","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":26,"opportunity_sum":32541.62000000001},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-04","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":3,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-04","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":147,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-04","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":31,"opportunity_sum":19159.120000000003},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-05","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-05","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":63,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-05","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":33,"opportunity_sum":13674.45},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-06","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":167,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-06","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":9,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-06","stage_code":"UC_482EN6","stage_name":"NegociaciÃ³n","bucket":"asignado","count":5,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-06","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":14,"opportunity_sum":2750.2400000000002},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"PREPAYMENT_INVOIC","stage_name":"AsignaciÃ³n Distribuidor","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"UC_482EN6","stage_name":"NegociaciÃ³n","bucket":"asignado","count":10,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":20,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":200,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-07","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":15,"opportunity_sum":10204.389999999998},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-08","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":72,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-08","stage_code":"UC_482EN6","stage_name":"NegociaciÃ³n","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-08","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":150,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-08","stage_code":"PREPAYMENT_INVOIC","stage_name":"AsignaciÃ³n Distribuidor","bucket":"asignado","count":2,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-08","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":17,"opportunity_sum":32971.350000000006},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-09","stage_code":"PREPARATION","stage_name":"GestiÃ³n","bucket":"asignado","count":27,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-09","stage_code":"FINAL_INVOICE","stage_name":"Lead No Calificado","bucket":"asignado","count":10,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-09","stage_code":"UC_ZW34R1","stage_name":"AsignaciÃ³n Asesor Comercial","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-09","stage_code":"UC_0IX14J","stage_name":"AceptaciÃ³n Ley Datos","bucket":"asignado","count":1,"opportunity_sum":0},{"advisor_id":"69","advisor_name":"JUAN PABLO TRUJILLO BiOALiMENTAR","category_id":"35","category_name":"MASCOTAS","month":"2026-09","stage_code":"WON","stage_name":"Negocio Ganado","bucket":"cerrado","count":1,"opportunity_sum":44.14}];
+const GENERATED_AT = "8 de septiembre de 2026, 16:12 (Ecuador)";
+
+const BUCKET_COLOR = { asignado: 'var(--series-asignado)', negado: 'var(--series-negado)', cerrado: 'var(--series-cerrado)', descartado: 'var(--series-descartado)' };
+const BUCKET_LABEL = { asignado: 'Asignado', negado: 'Negó', cerrado: 'Cerrado', descartado: 'Descartado' };
+const BUCKET_ORDER = ['asignado','negado','descartado','cerrado'];
+const MONTH_LABEL = { '2026-01':'Ene','2026-02':'Feb','2026-03':'Mar','2026-04':'Abr','2026-05':'May','2026-06':'Jun','2026-07':'Jul*' };
+const BOT_ADVISOR_NAME = 'Bioalimentar Digital';
+const PANORAMA_PIPELINES = ['BIO BALANCEADOS', 'BIOEQUINOS', 'LEADS', 'MASCOTAS'];
+const DEFAULT_ADVISORS = ['JESSICA TAPIA', 'JUAN PABLO TRUJILLO BiOALiMENTAR'];
+// Combina color + patrón de línea (no inventa colores fuera de la marca rojo/negro/gris).
+const LINE_STYLES = [
+  { color: 'var(--brand-red)',      dash: null,      css: 'solid'  },
+  { color: 'var(--text-primary)',   dash: null,      css: 'solid'  },
+  { color: 'var(--series-asignado)',dash: null,      css: 'solid'  },
+  { color: 'var(--brand-red)',      dash: '6,4',     css: 'dashed' },
+  { color: 'var(--text-primary)',   dash: '6,4',     css: 'dashed' },
+  { color: 'var(--series-asignado)',dash: '6,4',     css: 'dashed' },
+  { color: 'var(--brand-red)',      dash: '1.5,3',   css: 'dotted' },
+  { color: 'var(--text-primary)',   dash: '1.5,3',   css: 'dotted' },
+];
+
+function uniq(arr) { return [...new Set(arr)]; }
+const ALL_MONTHS = uniq(DATA.map(d => d.month)).sort();
+
+// Por defecto solo los 4 pipelines de venta real y los 2 asesores humanos activos
+// (pedido explícito del usuario); se pueden marcar los demás a mano en los filtros.
+let state = {
+  pipelines: new Set(PANORAMA_PIPELINES),
+  advisors: new Set(DEFAULT_ADVISORS),
+  months: new Set(ALL_MONTHS)
+};
+
+function buildCombo(panelId, lblId, items, stateKey) {
+  const panel = document.getElementById(panelId);
+  const actions = document.createElement('div');
+  actions.className = 'combo-actions';
+  actions.innerHTML = '<button data-a="all">Todos</button><button data-a="none">Ninguno</button>';
+  actions.querySelector('[data-a="all"]').onclick = () => { state[stateKey] = new Set(items); refresh(); };
+  actions.querySelector('[data-a="none"]').onclick = () => { state[stateKey] = new Set(); refresh(); };
+  panel.appendChild(actions);
+  items.forEach(it => {
+    const row = document.createElement('label');
+    row.className = 'combo-row';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = state[stateKey].has(it);
+    cb.dataset.item = it; cb.dataset.statekey = stateKey;
+    cb.onchange = () => {
+      if (cb.checked) state[stateKey].add(it); else state[stateKey].delete(it);
+      refresh();
+    };
+    row.appendChild(cb);
+    const span = document.createElement('span');
+    span.textContent = (stateKey === 'months') ? (MONTH_LABEL[it] || it) + ' ' + it.slice(0,4) : it;
+    row.appendChild(span);
+    row.onclick = (e) => { if (e.target !== cb) { cb.checked = !cb.checked; cb.onchange(); } };
+    panel.appendChild(row);
+  });
+}
+buildCombo('panel-pipeline','lbl-pipeline', PANORAMA_PIPELINES, 'pipelines');
+buildCombo('panel-advisor','lbl-advisor', DEFAULT_ADVISORS, 'advisors');
+buildCombo('panel-month','lbl-month', ALL_MONTHS, 'months');
+
+function toggleCombo(id) {
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.combo.open').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.combo')) document.querySelectorAll('.combo.open').forEach(c => c.classList.remove('open'));
+});
+
+function resetFilters() {
+  state = { pipelines: new Set(PANORAMA_PIPELINES), advisors: new Set(DEFAULT_ADVISORS), months: new Set(ALL_MONTHS) };
+  document.querySelectorAll('.combo-panel input[type=checkbox]').forEach(cb => {
+    cb.checked = state[cb.dataset.statekey].has(cb.dataset.item);
+  });
+  refresh();
+}
+
+function fmtInt(n) { return Math.round(n).toLocaleString('es-EC'); }
+function fmtUSD(n) { return '$' + Math.round(n).toLocaleString('es-EC'); }
+function fmtPct(n) { return (isFinite(n) ? n.toFixed(1) : '0.0') + '%'; }
+
+const tooltip = document.getElementById('tooltip');
+function showTip(evt, title, rows) {
+  tooltip.innerHTML = '<div class="tt-title">' + title + '</div>' +
+    rows.map(r => '<div class="tt-row"><span class="k">' + r[0] + '</span><span>' + r[1] + '</span></div>').join('');
+  tooltip.style.display = 'block';
+  positionTip(evt);
+}
+function positionTip(evt) {
+  const x = evt.clientX, y = evt.clientY;
+  tooltip.style.left = Math.min(x + 14, window.innerWidth - 260) + 'px';
+  tooltip.style.top = Math.min(y + 14, window.innerHeight - 100) + 'px';
+}
+function hideTip() { tooltip.style.display = 'none'; }
+
+function getFiltered() {
+  return DATA.filter(d => state.pipelines.has(d.category_name) && state.advisors.has(d.advisor_name) && state.months.has(d.month));
+}
+
+// Panorama general: pipelines fijos (BIO BALANCEADOS, BIOEQUINOS, LEADS, MASCOTAS),
+// ignora los filtros de Pipeline y Asesor a propósito — solo respeta Mes.
+function getPanoramaRows() {
+  return DATA.filter(d => PANORAMA_PIPELINES.includes(d.category_name) && state.months.has(d.month));
+}
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+
+// ---- Chart: stacked horizontal bars (leads por asesor) ----
+function renderAdvisorChart(rows) {
+  const container = document.getElementById('chart-advisor');
+  container.innerHTML = '';
+  const byAdv = {};
+  rows.forEach(r => {
+    if (!byAdv[r.advisor_name]) byAdv[r.advisor_name] = { asignado:0, negado:0, cerrado:0, descartado:0, total:0 };
+    byAdv[r.advisor_name][r.bucket] += r.count;
+    byAdv[r.advisor_name].total += r.count;
+  });
+  const list = Object.entries(byAdv).filter(([,v]) => v.total > 0).sort((a,b) => b[1].total - a[1].total);
+  if (!list.length) { container.innerHTML = '<div class="empty-state">Sin datos para los filtros seleccionados.</div>'; return; }
+  const max = Math.max(...list.map(([,v]) => v.total));
+  const W = container.clientWidth || 900;
+  const barAreaW = W - 210;
+  list.forEach(([name, v]) => {
+    const row = document.createElement('div'); row.className = 'bar-row';
+    const nameEl = document.createElement('div'); nameEl.className = 'name'; nameEl.textContent = name; nameEl.title = name;
+    row.appendChild(nameEl);
+    const track = document.createElement('div'); track.className = 'track';
+    const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+    let x = 0;
+    BUCKET_ORDER.forEach(b => {
+      const val = v[b];
+      if (!val) return;
+      const w = Math.max((val / max) * (barAreaW - 60), 0);
+      const rect = svgEl('rect', { x: x, y: 1, width: Math.max(w - 2, 0), height: 20, rx: 4, fill: BUCKET_COLOR[b] });
+      rect.addEventListener('mousemove', (e) => showTip(e, name, [[BUCKET_LABEL[b], fmtInt(val)], ['Total', fmtInt(v.total)]]));
+      rect.addEventListener('mouseleave', hideTip);
+      svg.appendChild(rect);
+      x += w;
+    });
+    track.appendChild(svg);
+    const totalLbl = document.createElement('div');
+    totalLbl.style.cssText = 'position:absolute;left:calc(100% - 52px);top:2px;font-size:11px;color:var(--text-secondary);font-variant-numeric:tabular-nums;';
+    totalLbl.textContent = fmtInt(v.total);
+    track.appendChild(totalLbl);
+    row.appendChild(track);
+    container.appendChild(row);
+  });
+  const legend = document.getElementById('legend-advisor');
+  legend.innerHTML = BUCKET_ORDER.map(b => `<span class="item"><span class="sw" style="background:${BUCKET_COLOR[b]}"></span>${BUCKET_LABEL[b]}</span>`).join('');
+}
+
+// ---- Chart: monthly trend (line) ----
+function renderTrendChart(rows) {
+  const container = document.getElementById('chart-trend');
+  container.innerHTML = '';
+  const byMonth = {};
+  ALL_MONTHS.forEach(m => byMonth[m] = { total: 0, cerrado: 0 });
+  rows.forEach(r => {
+    if (!byMonth[r.month]) return;
+    byMonth[r.month].total += r.count;
+    if (r.bucket === 'cerrado') byMonth[r.month].cerrado += r.count;
+  });
+  const months = ALL_MONTHS.filter(m => state.months.has(m));
+  if (!months.length) { container.innerHTML = '<div class="empty-state">Sin datos.</div>'; return; }
+  const W = 560, H = 240, padL = 44, padR = 16, padT = 16, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const maxTotal = Math.max(1, ...months.map(m => byMonth[m].total));
+  const svg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMid meet' });
+  // gridlines
+  const steps = 4;
+  for (let i = 0; i <= steps; i++) {
+    const y = padT + plotH - (i / steps) * plotH;
+    svg.appendChild(svgEl('line', { x1: padL, x2: W - padR, y1: y, y2: y, class: 'gridline' }));
+    const val = Math.round((i / steps) * maxTotal);
+    const t = svgEl('text', { x: padL - 8, y: y + 3, class: 'axis-label', 'text-anchor': 'end' });
+    t.textContent = val.toLocaleString('es-EC');
+    svg.appendChild(t);
+  }
+  const stepX = plotW / Math.max(months.length - 1, 1);
+  function pt(i, val) { return [padL + i * stepX, padT + plotH - (val / maxTotal) * plotH]; }
+  function pathFor(key, color) {
+    const pts = months.map((m, i) => pt(i, byMonth[m][key]));
+    const d = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    svg.appendChild(svgEl('path', { d, fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    pts.forEach((p, i) => {
+      const c = svgEl('circle', { cx: p[0], cy: p[1], r: 4, fill: color, stroke: 'var(--surface-1)', 'stroke-width': 2 });
+      c.addEventListener('mousemove', (e) => showTip(e, MONTH_LABEL[months[i]] + ' ' + months[i].slice(0,4), [['Total', fmtInt(byMonth[months[i]].total)], ['Cerrado', fmtInt(byMonth[months[i]].cerrado)]]));
+      c.addEventListener('mouseleave', hideTip);
+      svg.appendChild(c);
+    });
+  }
+  pathFor('total', 'var(--series-total)');
+  pathFor('cerrado', 'var(--series-cerrado)');
+  months.forEach((m, i) => {
+    const [x] = pt(i, 0);
+    const t = svgEl('text', { x, y: H - 8, class: 'axis-label', 'text-anchor': 'middle' });
+    t.textContent = MONTH_LABEL[m];
+    svg.appendChild(t);
+  });
+  container.appendChild(svg);
+  document.getElementById('legend-trend').innerHTML =
+    `<span class="item"><span class="sw" style="background:var(--series-total)"></span>Total prospectos</span>` +
+    `<span class="item"><span class="sw" style="background:var(--series-cerrado)"></span>Cerrado (compra)</span>`;
+}
+
+// ---- Chart: conversion % ranking (bars) ----
+function renderConvChart(rows) {
+  const container = document.getElementById('chart-conv');
+  container.innerHTML = '';
+  document.getElementById('legend-conv').innerHTML = '';
+  const byAdv = {};
+  rows.forEach(r => {
+    if (!byAdv[r.advisor_name]) byAdv[r.advisor_name] = { total: 0, cerrado: 0 };
+    byAdv[r.advisor_name].total += r.count;
+    if (r.bucket === 'cerrado') byAdv[r.advisor_name].cerrado += r.count;
+  });
+  const list = Object.entries(byAdv).filter(([,v]) => v.total > 0)
+    .map(([name, v]) => [name, v.cerrado / v.total * 100, v])
+    .sort((a,b) => b[1] - a[1]);
+  if (!list.length) { container.innerHTML = '<div class="empty-state">Sin datos.</div>'; return; }
+  const max = Math.max(...list.map(l => l[1]), 1);
+  const barAreaW = (container.clientWidth || 420) - 150;
+  list.forEach(([name, pct, v]) => {
+    const row = document.createElement('div'); row.className = 'bar-row';
+    const nameEl = document.createElement('div'); nameEl.className = 'name'; nameEl.style.width = '130px'; nameEl.textContent = name; nameEl.title = name;
+    row.appendChild(nameEl);
+    const track = document.createElement('div'); track.className = 'track';
+    const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+    const w = Math.max((pct / max) * (barAreaW - 50), 2);
+    const rect = svgEl('rect', { x: 0, y: 1, width: w, height: 20, rx: 4, fill: 'var(--series-total)' });
+    rect.addEventListener('mousemove', (e) => showTip(e, name, [['Conversión', fmtPct(pct)], ['Cerrado', fmtInt(v.cerrado)], ['Total', fmtInt(v.total)]]));
+    rect.addEventListener('mouseleave', hideTip);
+    svg.appendChild(rect);
+    const lbl = svgEl('text', { x: w + 6, y: 15, class: 'axis-label', fill: 'var(--text-secondary)' });
+    lbl.textContent = pct.toFixed(1) + '%';
+    svg.appendChild(lbl);
+    track.appendChild(svg);
+    row.appendChild(track);
+    container.appendChild(row);
+  });
+}
+
+// ---- Chart: conversion % by month, one line per advisor ----
+function renderConvMonthChart(rows) {
+  const container = document.getElementById('chart-conv');
+  container.innerHTML = '';
+  const months = ALL_MONTHS.filter(m => state.months.has(m));
+  if (!months.length) { container.innerHTML = '<div class="empty-state">Sin datos.</div>'; document.getElementById('legend-conv').innerHTML = ''; return; }
+
+  const byAdv = {};
+  rows.forEach(r => {
+    if (!byAdv[r.advisor_name]) {
+      byAdv[r.advisor_name] = { total: 0, byMonth: {} };
+      months.forEach(m => byAdv[r.advisor_name].byMonth[m] = { total: 0, cerrado: 0 });
+    }
+    byAdv[r.advisor_name].total += r.count;
+    if (!byAdv[r.advisor_name].byMonth[r.month]) return;
+    byAdv[r.advisor_name].byMonth[r.month].total += r.count;
+    if (r.bucket === 'cerrado') byAdv[r.advisor_name].byMonth[r.month].cerrado += r.count;
+  });
+  const advisors = Object.entries(byAdv).filter(([,v]) => v.total > 0).sort((a,b) => b[1].total - a[1].total).slice(0, LINE_STYLES.length);
+  if (!advisors.length) { container.innerHTML = '<div class="empty-state">Sin datos.</div>'; document.getElementById('legend-conv').innerHTML = ''; return; }
+
+  const pctFor = (v, m) => v.byMonth[m].total ? (v.byMonth[m].cerrado / v.byMonth[m].total * 100) : null;
+  const allPct = [];
+  advisors.forEach(([, v]) => months.forEach(m => { const p = pctFor(v, m); if (p !== null) allPct.push(p); }));
+  const maxPct = Math.max(10, ...allPct) * 1.15;
+
+  const W = 420, H = 260, padL = 40, padR = 16, padT = 16, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const svg = svgEl('svg', { width: '100%', viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'xMidYMid meet' });
+  const steps = 4;
+  for (let i = 0; i <= steps; i++) {
+    const y = padT + plotH - (i / steps) * plotH;
+    svg.appendChild(svgEl('line', { x1: padL, x2: W - padR, y1: y, y2: y, class: 'gridline' }));
+    const val = (i / steps) * maxPct;
+    const t = svgEl('text', { x: padL - 8, y: y + 3, class: 'axis-label', 'text-anchor': 'end' });
+    t.textContent = val.toFixed(0) + '%';
+    svg.appendChild(t);
+  }
+  const stepX = plotW / Math.max(months.length - 1, 1);
+  function pt(i, val) { return [padL + i * stepX, padT + plotH - (val / maxPct) * plotH]; }
+
+  advisors.forEach(([name, v], si) => {
+    const style = LINE_STYLES[si];
+    const known = months.map((m, i) => ({ i, p: pctFor(v, m) })).filter(x => x.p !== null);
+    if (!known.length) return;
+    const pts = known.map(x => pt(x.i, x.p));
+    const d = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const pathAttrs = { d, fill: 'none', stroke: style.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' };
+    if (style.dash) pathAttrs['stroke-dasharray'] = style.dash;
+    svg.appendChild(svgEl('path', pathAttrs));
+    known.forEach((x, idx) => {
+      const p = pts[idx];
+      const c = svgEl('circle', { cx: p[0], cy: p[1], r: 3.5, fill: style.color, stroke: 'var(--surface-1)', 'stroke-width': 1.5 });
+      const m = months[x.i];
+      c.addEventListener('mousemove', (e) => showTip(e, name, [[MONTH_LABEL[m], fmtPct(x.p)], ['Cerrado', fmtInt(v.byMonth[m].cerrado)], ['Total', fmtInt(v.byMonth[m].total)]]));
+      c.addEventListener('mouseleave', hideTip);
+      svg.appendChild(c);
+    });
+  });
+  months.forEach((m, i) => {
+    const [x] = pt(i, 0);
+    const t = svgEl('text', { x, y: H - 8, class: 'axis-label', 'text-anchor': 'middle' });
+    t.textContent = MONTH_LABEL[m];
+    svg.appendChild(t);
+  });
+  container.appendChild(svg);
+
+  document.getElementById('legend-conv').innerHTML = advisors.map(([name], i) => {
+    const style = LINE_STYLES[i];
+    return `<span class="item"><span class="sw-line" style="border-top-color:${style.color};border-top-style:${style.css}"></span>${name}</span>`;
+  }).join('');
+}
+
+let convView = 'advisor';
+function setConvView(view) {
+  convView = view;
+  document.querySelectorAll('#conv-toggle button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  document.getElementById('conv-sub-label').textContent = view === 'advisor'
+    ? 'Cerrado / Total, solo asesores con actividad'
+    : 'Cerrado / Total, por mes';
+  refresh();
+}
+
+// ---- Chart: pipeline distribution (bars) ----
+function renderPipelineChart(rows) {
+  const container = document.getElementById('chart-pipeline');
+  container.innerHTML = '';
+  const byCat = {};
+  rows.forEach(r => { byCat[r.category_name] = (byCat[r.category_name] || 0) + r.count; });
+  const list = Object.entries(byCat).filter(([,v]) => v > 0).sort((a,b) => b[1] - a[1]);
+  if (!list.length) { container.innerHTML = '<div class="empty-state">Sin datos.</div>'; return; }
+  const max = Math.max(...list.map(l => l[1]));
+  const barAreaW = (container.clientWidth || 900) - 210;
+  list.forEach(([name, val]) => {
+    const row = document.createElement('div'); row.className = 'bar-row';
+    const nameEl = document.createElement('div'); nameEl.className = 'name'; nameEl.textContent = name; nameEl.title = name;
+    row.appendChild(nameEl);
+    const track = document.createElement('div'); track.className = 'track';
+    const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+    const w = Math.max((val / max) * (barAreaW - 60), 2);
+    const rect = svgEl('rect', { x: 0, y: 1, width: w, height: 20, rx: 4, fill: 'var(--series-total)' });
+    rect.addEventListener('mousemove', (e) => showTip(e, name, [['Registros', fmtInt(val)]]));
+    rect.addEventListener('mouseleave', hideTip);
+    svg.appendChild(rect);
+    const lbl = svgEl('text', { x: w + 6, y: 15, class: 'axis-label', fill: 'var(--text-secondary)' });
+    lbl.textContent = fmtInt(val);
+    svg.appendChild(lbl);
+    track.appendChild(svg);
+    row.appendChild(track);
+    container.appendChild(row);
+  });
+}
+
+function renderTable(rows) {
+  const byAdv = {};
+  rows.forEach(r => {
+    if (!byAdv[r.advisor_name]) byAdv[r.advisor_name] = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 };
+    byAdv[r.advisor_name][r.bucket] += r.count;
+    byAdv[r.advisor_name].total += r.count;
+    if (r.bucket === 'cerrado') byAdv[r.advisor_name].opp += r.opportunity_sum;
+  });
+  const list = Object.entries(byAdv).filter(([,v]) => v.total > 0).sort((a,b) => b[1].total - a[1].total);
+  let html = '<table class="datatable"><thead><tr><th>Asesor</th><th>Total</th><th>Asignado</th><th>Negó</th><th>Cerrado</th><th>Descartado</th><th>% Conv.</th><th>Valor cerrado</th></tr></thead><tbody>';
+  list.forEach(([name, v]) => {
+    html += `<tr><td>${name}</td><td>${fmtInt(v.total)}</td><td>${fmtInt(v.asignado)}</td><td>${fmtInt(v.negado)}</td><td>${fmtInt(v.cerrado)}</td><td>${fmtInt(v.descartado)}</td><td>${fmtPct(v.cerrado / v.total * 100)}</td><td>${fmtUSD(v.opp)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('table-wrap').innerHTML = html;
+}
+
+// ---- Embudo: Todos los leads -> Asignados (pipeline LEADS) -> Cerrados
+// (suma de cerrados de BIO BALANCEADOS + MASCOTAS + BIOEQUINOS) ----
+function renderPipelineFunnel(fixedRows) {
+  const container = document.getElementById('funnel-pipelines');
+  container.innerHTML = '';
+  let total = 0;
+  let asignados = 0;
+  let cerrados = 0;
+  fixedRows.forEach(r => {
+    total += r.count;
+    if (r.category_name === 'LEADS') asignados += r.count;
+    else if (r.bucket === 'cerrado') cerrados += r.count;
+  });
+  if (!total) { container.innerHTML = '<div class="empty-state">Sin datos para el mes seleccionado.</div>'; return; }
+  const stages = [
+    { label: 'Todos los leads', value: total,     bg: 'var(--brand-red)',        color: '#ffffff' },
+    { label: 'Asignados',       value: asignados, bg: 'var(--series-asignado)',  color: 'var(--on-asignado)' },
+    { label: 'Cerrados',        value: cerrados,  bg: 'var(--series-cerrado)',   color: 'var(--on-cerrado)' },
+  ];
+  stages.forEach(s => {
+    const pct = total ? (s.value / total * 100) : 0;
+    const widthPct = Math.max(pct, s.value > 0 ? 3 : 0.6);
+    const row = document.createElement('div'); row.className = 'funnel-row';
+    const label = document.createElement('div'); label.className = 'funnel-label'; label.textContent = s.label;
+    const track = document.createElement('div'); track.className = 'funnel-track';
+    const bar = document.createElement('div'); bar.className = 'funnel-bar';
+    bar.style.width = widthPct.toFixed(1) + '%';
+    bar.style.background = s.bg;
+    bar.style.color = s.color;
+    bar.innerHTML = fmtInt(s.value) + (s.label !== 'Todos los leads' ? `<span class="pct">${pct.toFixed(1)}%</span>` : '');
+    bar.addEventListener('mousemove', (e) => showTip(e, s.label, [['Cantidad', fmtInt(s.value)], ['% del total', fmtPct(pct)]]));
+    bar.addEventListener('mouseleave', hideTip);
+    track.appendChild(bar);
+    row.appendChild(label);
+    row.appendChild(track);
+    container.appendChild(row);
+  });
+}
+
+function toggleTable() {
+  const wrap = document.getElementById('table-wrap');
+  const btn = document.getElementById('table-toggle');
+  const show = wrap.style.display === 'none';
+  wrap.style.display = show ? 'block' : 'none';
+  btn.textContent = show ? 'Ocultar tabla de datos ▴' : 'Ver tabla de datos ▾';
+}
+
+function refresh() {
+  const rows = getFiltered();
+  document.getElementById('lbl-pipeline').textContent = state.pipelines.size === PANORAMA_PIPELINES.length ? 'Todos' : state.pipelines.size + '/' + PANORAMA_PIPELINES.length;
+  document.getElementById('lbl-advisor').textContent = state.advisors.size === DEFAULT_ADVISORS.length ? 'Todos' : state.advisors.size + '/' + DEFAULT_ADVISORS.length;
+  document.getElementById('lbl-month').textContent = state.months.size === ALL_MONTHS.length ? 'Todos' : state.months.size + '/' + ALL_MONTHS.length;
+
+  // Panorama general: pipelines fijos, ignora Pipeline y Asesor, solo respeta Mes (ver getPanoramaRows).
+  const fixedRows = getPanoramaRows();
+  const fx = { asignado: 0, negado: 0, cerrado: 0, descartado: 0, total: 0, opp: 0, bot: 0 };
+  fixedRows.forEach(r => {
+    fx[r.bucket] += r.count;
+    fx.total += r.count;
+    if (r.bucket === 'cerrado') fx.opp += r.opportunity_sum;
+    if (r.advisor_name === BOT_ADVISOR_NAME) fx.bot += r.count;
+  });
+  const fixedRedirected = fx.total - fx.bot;
+  document.getElementById('kpi-total-fixed').textContent = fmtInt(fx.total);
+  document.getElementById('kpi-fixed-asignado').textContent = fmtInt(fx.asignado);
+  document.getElementById('kpi-fixed-asignado-pct').textContent = fmtPct(fx.asignado / fx.total * 100 || 0) + ' del total';
+  document.getElementById('kpi-fixed-cerrado').textContent = fmtInt(fx.cerrado);
+  document.getElementById('kpi-fixed-cerrado-pct').textContent = fmtPct(fx.cerrado / fx.total * 100 || 0) + ' del total';
+  document.getElementById('kpi-fixed-conv').textContent = fmtPct(fx.cerrado / fx.total * 100 || 0);
+  document.getElementById('kpi-fixed-valor').textContent = fmtUSD(fx.opp) + ' en compras';
+  document.getElementById('kpi-redirected').textContent = fmtInt(fixedRedirected);
+  document.getElementById('kpi-redirected-pct').textContent = fmtPct(fixedRedirected / fx.total * 100 || 0) + ' del total general';
+  document.getElementById('kpi-unredirected').textContent = fmtInt(fx.bot);
+  document.getElementById('kpi-unredirected-pct').textContent = fmtPct(fx.bot / fx.total * 100 || 0) + ' del total general · aún con "' + BOT_ADVISOR_NAME + '"';
+
+  const sums = { asignado: 0, negado: 0, cerrado: 0, descartado: 0, total: 0, opp: 0 };
+  rows.forEach(r => { sums[r.bucket] += r.count; sums.total += r.count; if (r.bucket === 'cerrado') sums.opp += r.opportunity_sum; });
+
+  document.getElementById('kpi-total').textContent = fmtInt(sums.total);
+  document.getElementById('kpi-asignado').textContent = fmtInt(sums.asignado);
+  document.getElementById('kpi-asignado-pct').textContent = fmtPct(sums.asignado / sums.total * 100 || 0) + ' del total';
+  document.getElementById('kpi-negado').textContent = fmtInt(sums.negado);
+  document.getElementById('kpi-negado-pct').textContent = fmtPct(sums.negado / sums.total * 100 || 0) + ' del total';
+  document.getElementById('kpi-cerrado').textContent = fmtInt(sums.cerrado);
+  document.getElementById('kpi-cerrado-pct').textContent = fmtPct(sums.cerrado / sums.total * 100 || 0) + ' del total';
+  document.getElementById('kpi-descartado').textContent = fmtInt(sums.descartado);
+  document.getElementById('kpi-descartado-pct').textContent = fmtPct(sums.descartado / sums.total * 100 || 0) + ' del total';
+  document.getElementById('kpi-conv').textContent = fmtPct(sums.cerrado / sums.total * 100 || 0);
+  document.getElementById('kpi-valor').textContent = fmtUSD(sums.opp) + ' en compras';
+  document.getElementById('fb-summary').textContent = fmtInt(sums.total) + ' de ' + fmtInt(DATA.reduce((a,d) => a + d.count, 0)) + ' registros';
+
+  renderAdvisorChart(rows);
+  renderTrendChart(rows);
+  if (convView === 'month') { renderConvMonthChart(rows); } else { renderConvChart(rows); }
+  renderPipelineChart(rows);
+  renderTable(rows);
+  renderPipelineFunnel(fixedRows);
+}
+
+function setTheme(mode) {
+  document.documentElement.setAttribute('data-theme', mode);
+  document.querySelectorAll('#theme-toggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  refresh();
+}
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+setTheme(prefersDark ? 'dark' : 'light');
+window.addEventListener('resize', () => { refresh(); });
+
+// ---- Descargar reporte PDF del panel filtrado (capacidad "downloads" del visor) ----
+let downloadsCap = null;
+(async () => {
+  try { downloadsCap = (window.claude && claude.use) ? await claude.use('downloads') : null; }
+  catch (e) { downloadsCap = null; }
+})();
+
+function filterSummaryText() {
+  return { p: [...state.pipelines].join(', ') || '(ninguno)',
+           a: [...state.advisors].join(', ') || '(ninguno)',
+           m: [...state.months].sort().join(', ') || '(ninguno)' };
+}
+
+// Fallback universal (sirve sin sesion iniciada): dialogo de impresion -> "Guardar como PDF".
+function printReport() {
+  const html = document.documentElement;
+  const prevTheme = html.getAttribute('data-theme');
+  const tw = document.getElementById('table-wrap');
+  const twHidden = tw.style.display === 'none';
+  const f = filterSummaryText();
+  document.getElementById('print-head').innerHTML =
+    'Reporte generado ' + new Date().toLocaleString('es-EC') + '<br>' +
+    '<b>Pipelines:</b> ' + f.p + '<br><b>Asesores:</b> ' + f.a + '<br><b>Meses:</b> ' + f.m;
+  html.setAttribute('data-theme', 'light');
+  tw.style.display = 'block';
+  const restore = () => {
+    if (prevTheme) html.setAttribute('data-theme', prevTheme); else html.removeAttribute('data-theme');
+    if (twHidden) tw.style.display = 'none';
+    window.removeEventListener('afterprint', restore);
+  };
+  window.addEventListener('afterprint', restore);
+  setTimeout(() => { try { window.print(); } catch (e) { restore(); alert('Usa Ctrl+P para guardar el reporte como PDF.'); } }, 80);
+}
+
+// Reune las mismas cifras que muestra la pagina para los filtros activos.
+function collectReport() {
+  const rows = getFiltered();
+  const fixedRows = getPanoramaRows();
+
+  const fx = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0, bot:0 };
+  fixedRows.forEach(r => {
+    fx[r.bucket] += r.count; fx.total += r.count;
+    if (r.bucket === 'cerrado') fx.opp += r.opportunity_sum;
+    if (r.advisor_name === BOT_ADVISOR_NAME) fx.bot += r.count;
+  });
+
+  const sums = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 };
+  rows.forEach(r => { sums[r.bucket] += r.count; sums.total += r.count; if (r.bucket === 'cerrado') sums.opp += r.opportunity_sum; });
+
+  const byAdv = {};
+  rows.forEach(r => {
+    if (!byAdv[r.advisor_name]) byAdv[r.advisor_name] = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 };
+    byAdv[r.advisor_name][r.bucket] += r.count;
+    byAdv[r.advisor_name].total += r.count;
+    if (r.bucket === 'cerrado') byAdv[r.advisor_name].opp += r.opportunity_sum;
+  });
+  const advisors = Object.entries(byAdv).filter(([,v]) => v.total > 0).sort((a,b) => b[1].total - a[1].total);
+
+  let fTot = 0, fAsig = 0, fCerr = 0;
+  fixedRows.forEach(r => {
+    fTot += r.count;
+    if (r.category_name === 'LEADS') fAsig += r.count;
+    else if (r.bucket === 'cerrado') fCerr += r.count;
+  });
+
+  return { rows, fx, sums, advisors, funnel: { total: fTot, asignados: fAsig, cerrados: fCerr } };
+}
+
+function pdfFileName() {
+  const monthsSel = [...state.months].sort();
+  let tag = 'filtrado';
+  if (monthsSel.length === 1) tag = monthsSel[0];
+  else if (monthsSel.length === ALL_MONTHS.length) tag = 'todos-los-meses';
+  else if (monthsSel.length) tag = monthsSel[0] + '_a_' + monthsSel[monthsSel.length - 1];
+  return 'reporte-leads-x-asesor_' + tag + '.pdf';
+}
+
+function buildPdfDoc() {
+    const R = collectReport();
+    const monthsSel = [...state.months].sort();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const M = 14, pageW = doc.internal.pageSize.getWidth();
+    const RED = [200, 16, 46], GREY = [120, 120, 120];
+    let y = 16;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
+    doc.text('Leads x Asesor - Bioalimentar 2026', M, y); y += 6;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+    doc.text('Actualizado ' + GENERATED_AT, M, y); y += 4;
+    doc.text('Reporte generado ' + new Date().toLocaleString('es-EC'), M, y); y += 7;
+    doc.setTextColor(0);
+
+    doc.setFontSize(9);
+    [['Pipelines', [...state.pipelines].join(', ') || '(ninguno)'],
+     ['Asesores', [...state.advisors].join(', ') || '(ninguno)'],
+     ['Meses', monthsSel.join(', ') || '(ninguno)']].forEach(([k, v]) => {
+      doc.setFont('helvetica', 'bold'); doc.text(k + ':', M, y);
+      doc.setFont('helvetica', 'normal');
+      const lines = doc.splitTextToSize(v, pageW - M * 2 - 22);
+      doc.text(lines, M + 22, y);
+      y += Math.max(lines.length * 4.4, 5);
+    });
+    y += 2;
+
+    const pct = (a, b) => fmtPct(b ? a / b * 100 : 0);
+    const tblOpts = {
+      theme: 'grid', margin: { left: M, right: M },
+      styles: { fontSize: 9, cellPadding: 1.6 },
+      headStyles: { fillColor: RED, textColor: 255, fontStyle: 'bold' },
+      columnStyles: { 1: { halign: 'right' } },
+    };
+
+    doc.autoTable({
+      ...tblOpts, startY: y,
+      head: [['Panorama general (BIO BALANCEADOS + BIOEQUINOS + LEADS + MASCOTAS, solo filtro Mes)', '']],
+      body: [
+        ['Total general de leads', fmtInt(R.fx.total)],
+        ['Asignado (en negociacion)', fmtInt(R.fx.asignado) + '  (' + pct(R.fx.asignado, R.fx.total) + ')'],
+        ['Cerrado (compra)', fmtInt(R.fx.cerrado) + '  (' + pct(R.fx.cerrado, R.fx.total) + ')'],
+        ['% Conversion', pct(R.fx.cerrado, R.fx.total)],
+        ['Valor en compras', fmtUSD(R.fx.opp)],
+        ['Redirigidos a un asesor', fmtInt(R.fx.total - R.fx.bot) + '  (' + pct(R.fx.total - R.fx.bot, R.fx.total) + ')'],
+        ['Sin redirigir (bot)', fmtInt(R.fx.bot) + '  (' + pct(R.fx.bot, R.fx.total) + ')'],
+      ],
+    });
+
+    doc.autoTable({
+      ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+      head: [['Segun filtros seleccionados (Pipeline + Asesor + Mes)', '']],
+      body: [
+        ['Total (filtrado)', fmtInt(R.sums.total)],
+        ['Asignado', fmtInt(R.sums.asignado) + '  (' + pct(R.sums.asignado, R.sums.total) + ')'],
+        ['Nego', fmtInt(R.sums.negado) + '  (' + pct(R.sums.negado, R.sums.total) + ')'],
+        ['Cerrado (compra)', fmtInt(R.sums.cerrado) + '  (' + pct(R.sums.cerrado, R.sums.total) + ')'],
+        ['Descartados', fmtInt(R.sums.descartado) + '  (' + pct(R.sums.descartado, R.sums.total) + ')'],
+        ['% Conversion', pct(R.sums.cerrado, R.sums.total)],
+        ['Valor en compras', fmtUSD(R.sums.opp)],
+      ],
+    });
+
+    doc.autoTable({
+      ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+      head: [['Asesor', 'Total', 'Asignado', 'Nego', 'Cerrado', 'Descart.', '% Conv.', 'Valor cerrado']],
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } },
+      body: R.advisors.map(([name, v]) => [
+        name, fmtInt(v.total), fmtInt(v.asignado), fmtInt(v.negado), fmtInt(v.cerrado),
+        fmtInt(v.descartado), pct(v.cerrado, v.total), fmtUSD(v.opp),
+      ]),
+      foot: [(() => {
+        const t = R.advisors.reduce((a, [, v]) => {
+          ['asignado','negado','cerrado','descartado','total','opp'].forEach(k => a[k] += v[k]); return a;
+        }, { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 });
+        return ['TOTAL', fmtInt(t.total), fmtInt(t.asignado), fmtInt(t.negado), fmtInt(t.cerrado),
+          fmtInt(t.descartado), pct(t.cerrado, t.total), fmtUSD(t.opp)];
+      })()],
+      footStyles: { fillColor: [240, 240, 237], textColor: 0, fontStyle: 'bold' },
+    });
+
+    const fn = R.funnel;
+    doc.autoTable({
+      ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+      head: [['Embudo (todos los asesores, solo filtro Mes)', '']],
+      body: [
+        ['Todos los leads', fmtInt(fn.total)],
+        ['Asignados (pipeline LEADS)', fmtInt(fn.asignados) + '  (' + pct(fn.asignados, fn.total) + ')'],
+        ['Cerrados (BIO BALANCEADOS + MASCOTAS + BIOEQUINOS)', fmtInt(fn.cerrados) + '  (' + pct(fn.cerrados, fn.total) + ')'],
+      ],
+    });
+
+    doc.setFontSize(7.5); doc.setTextColor(...GREY);
+    doc.text('Fuente: Bitrix24 (crm.deal), todos los pipelines, registros creados en 2026. El mes en curso aparece parcial.',
+      M, doc.internal.pageSize.getHeight() - 8);
+
+    return doc;
+}
+
+async function downloadReport() {
+  const btn = document.getElementById('btn-download');
+  const prev = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Generando…';
+  try {
+    if (!window.jspdf || !window.jspdf.jsPDF || !window.jspdf.jsPDF.API || typeof (new window.jspdf.jsPDF()).autoTable !== 'function') {
+      alert('No se pudo cargar el generador de PDF (jsPDF). Puede ser un bloqueo de red/ad-blocker. Probá recargar, otra red u otro navegador.');
+      return;
+    }
+    let doc;
+    try { doc = buildPdfDoc(); }
+    catch (e) { alert('Error al armar el reporte: ' + ((e && e.message) || e)); return; }
+    const blob = doc.output('blob');
+    const filename = pdfFileName();
+
+    // 1) Dentro de Claude con sesion iniciada: la capacidad "downloads".
+    if (downloadsCap) {
+      try {
+        await downloadsCap.save({ filename, data: blob });
+        return;
+      } catch (e) {
+        if (e && e.code === 'declined') return;
+        alert('Claude no pudo guardar el archivo (' + ((e && e.code) || '?') + '). '
+          + 'Probá abrir el dashboard desde el link publico (no el de claude.ai).');
+        return;
+      }
+    }
+
+    // 2) Pagina normal (GitHub Pages / archivo local): descarga directa del navegador.
+    try {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      return;
+    } catch (e) { /* sigue al fallback */ }
+
+    // 3) Visor de Claude sin sesion: la plataforma bloquea toda descarga.
+    alert('Este visor no permite descargar archivos. Opciones:\n'
+      + '  - Inicia sesion en claude.ai (cuenta gratis) y volve a abrir el link, o\n'
+      + '  - Abri el dashboard desde el link publico que te pasaron (GitHub Pages).');
+  } finally {
+    btn.disabled = false; btn.textContent = prev;
+  }
+}
+</script>

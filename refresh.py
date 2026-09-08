@@ -184,7 +184,14 @@ def main():
     with open(os.path.join(ROOT, "dashboard.html"), "w", encoding="utf-8") as f:
         f.write(final)
 
-    print(f"Listo. dashboard.html actualizado en {ROOT}")
+    # Copia para GitHub Pages (docs/index.html): pagina publica sin sandbox, donde el boton
+    # "Descargar reporte (PDF)" si baja el archivo sin iniciar sesion en Claude.
+    docs_dir = os.path.join(ROOT, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    with open(os.path.join(docs_dir, "index.html"), "w", encoding="utf-8") as f:
+        f.write(final)
+
+    print(f"Listo. dashboard.html y docs/index.html actualizados en {ROOT}")
 
 
 if __name__ == "__main__":

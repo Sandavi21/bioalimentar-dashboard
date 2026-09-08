@@ -165,6 +165,13 @@
     border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; cursor: pointer;
   }
   .reset-btn:hover { color: var(--brand-red); border-color: var(--brand-red); }
+  .dl-btn {
+    font: inherit; font-size: 13px; font-weight: 600; color: #ffffff;
+    background: var(--brand-red); border: 1px solid var(--brand-red);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer;
+  }
+  .dl-btn:hover { background: var(--brand-red-ink); border-color: var(--brand-red-ink); }
+  .dl-btn:disabled { opacity: 0.6; cursor: default; }
   .fb-summary { margin-left: auto; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
   /* KPI grid */
@@ -245,6 +252,32 @@
   }
   .funnel-bar .pct { font-size: 11px; font-weight: 600; opacity: 0.85; margin-left: 6px; }
   @media (max-width: 560px) { .funnel-label { width: 78px; font-size: 11px; } .funnel-bar { font-size: 13px; height: 38px; } }
+
+  /* ---- Impresion / Guardar como PDF (funciona sin sesion iniciada) ---- */
+  .print-only { display: none; }
+  @media print {
+    @page { margin: 12mm; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #fff; color: #111; }
+    .wrap { max-width: none; padding: 0; }
+    .brand-band { background: var(--brand-red) !important; }
+    header.top { background: #fff; color: #111; margin: 0 0 12px; padding: 0 0 10px; border-bottom: 1px solid #ddd; }
+    header.top p { color: #555; }
+    header.top .eyebrow { color: #777; }
+    header.top .divider { background: rgba(0,0,0,0.15); }
+    .theme-toggle, .filterbar, #btn-download, .table-toggle, #tooltip { display: none !important; }
+    .print-only { display: block; }
+    #print-head {
+      font-size: 11px; color: #333; margin: 0 0 16px; padding: 8px 10px;
+      border: 1px solid #ddd; border-radius: 6px; line-height: 1.6;
+    }
+    #print-head b { color: #111; }
+    #table-wrap { display: block !important; }
+    .card, .kpi { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .grid-2, .bar-row, .funnel-row { break-inside: avoid; }
+    .section-title { break-after: avoid; }
+    .glossary { break-inside: avoid; }
+  }
 </style>
 
 <div class="viz-root">
@@ -288,8 +321,11 @@
     </div>
 
     <button class="reset-btn" onclick="resetFilters()">Restablecer</button>
+    <button class="dl-btn" id="btn-download" onclick="downloadReport()" title="Genera un PDF del panel con los filtros actuales">⬇ Descargar reporte (PDF)</button>
     <span class="fb-summary" id="fb-summary"></span>
   </div>
+
+  <div id="print-head" class="print-only"></div>
 
   <div class="section-title" style="margin-top:4px;">Panorama general</div>
   <div class="section-sub">Fijo a BIO BALANCEADOS + BIOEQUINOS + LEADS + MASCOTAS — no cambia con Pipeline ni Asesor, solo con Mes</div>
@@ -427,8 +463,11 @@
 
 <div id="tooltip"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script>
 const DATA = /*__LEADS_DATA__*/;
+const GENERATED_AT = "/*__GENERATED_AT__*/";
 
 const BUCKET_COLOR = { asignado: 'var(--series-asignado)', negado: 'var(--series-negado)', cerrado: 'var(--series-cerrado)', descartado: 'var(--series-descartado)' };
 const BUCKET_LABEL = { asignado: 'Asignado', negado: 'Negó', cerrado: 'Cerrado', descartado: 'Descartado' };
@@ -914,4 +953,228 @@ function setTheme(mode) {
 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 setTheme(prefersDark ? 'dark' : 'light');
 window.addEventListener('resize', () => { refresh(); });
+
+// ---- Descargar reporte PDF del panel filtrado (capacidad "downloads" del visor) ----
+let downloadsCap = null;
+(async () => {
+  try { downloadsCap = (window.claude && claude.use) ? await claude.use('downloads') : null; }
+  catch (e) { downloadsCap = null; }
+})();
+
+function filterSummaryText() {
+  return { p: [...state.pipelines].join(', ') || '(ninguno)',
+           a: [...state.advisors].join(', ') || '(ninguno)',
+           m: [...state.months].sort().join(', ') || '(ninguno)' };
+}
+
+// Fallback universal (sirve sin sesion iniciada): dialogo de impresion -> "Guardar como PDF".
+function printReport() {
+  const html = document.documentElement;
+  const prevTheme = html.getAttribute('data-theme');
+  const tw = document.getElementById('table-wrap');
+  const twHidden = tw.style.display === 'none';
+  const f = filterSummaryText();
+  document.getElementById('print-head').innerHTML =
+    'Reporte generado ' + new Date().toLocaleString('es-EC') + '<br>' +
+    '<b>Pipelines:</b> ' + f.p + '<br><b>Asesores:</b> ' + f.a + '<br><b>Meses:</b> ' + f.m;
+  html.setAttribute('data-theme', 'light');
+  tw.style.display = 'block';
+  const restore = () => {
+    if (prevTheme) html.setAttribute('data-theme', prevTheme); else html.removeAttribute('data-theme');
+    if (twHidden) tw.style.display = 'none';
+    window.removeEventListener('afterprint', restore);
+  };
+  window.addEventListener('afterprint', restore);
+  setTimeout(() => { try { window.print(); } catch (e) { restore(); alert('Usa Ctrl+P para guardar el reporte como PDF.'); } }, 80);
+}
+
+// Reune las mismas cifras que muestra la pagina para los filtros activos.
+function collectReport() {
+  const rows = getFiltered();
+  const fixedRows = getPanoramaRows();
+
+  const fx = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0, bot:0 };
+  fixedRows.forEach(r => {
+    fx[r.bucket] += r.count; fx.total += r.count;
+    if (r.bucket === 'cerrado') fx.opp += r.opportunity_sum;
+    if (r.advisor_name === BOT_ADVISOR_NAME) fx.bot += r.count;
+  });
+
+  const sums = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 };
+  rows.forEach(r => { sums[r.bucket] += r.count; sums.total += r.count; if (r.bucket === 'cerrado') sums.opp += r.opportunity_sum; });
+
+  const byAdv = {};
+  rows.forEach(r => {
+    if (!byAdv[r.advisor_name]) byAdv[r.advisor_name] = { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 };
+    byAdv[r.advisor_name][r.bucket] += r.count;
+    byAdv[r.advisor_name].total += r.count;
+    if (r.bucket === 'cerrado') byAdv[r.advisor_name].opp += r.opportunity_sum;
+  });
+  const advisors = Object.entries(byAdv).filter(([,v]) => v.total > 0).sort((a,b) => b[1].total - a[1].total);
+
+  let fTot = 0, fAsig = 0, fCerr = 0;
+  fixedRows.forEach(r => {
+    fTot += r.count;
+    if (r.category_name === 'LEADS') fAsig += r.count;
+    else if (r.bucket === 'cerrado') fCerr += r.count;
+  });
+
+  return { rows, fx, sums, advisors, funnel: { total: fTot, asignados: fAsig, cerrados: fCerr } };
+}
+
+function pdfFileName() {
+  const monthsSel = [...state.months].sort();
+  let tag = 'filtrado';
+  if (monthsSel.length === 1) tag = monthsSel[0];
+  else if (monthsSel.length === ALL_MONTHS.length) tag = 'todos-los-meses';
+  else if (monthsSel.length) tag = monthsSel[0] + '_a_' + monthsSel[monthsSel.length - 1];
+  return 'reporte-leads-x-asesor_' + tag + '.pdf';
+}
+
+function buildPdfDoc() {
+    const R = collectReport();
+    const monthsSel = [...state.months].sort();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const M = 14, pageW = doc.internal.pageSize.getWidth();
+    const RED = [200, 16, 46], GREY = [120, 120, 120];
+    let y = 16;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
+    doc.text('Leads x Asesor - Bioalimentar 2026', M, y); y += 6;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+    doc.text('Actualizado ' + GENERATED_AT, M, y); y += 4;
+    doc.text('Reporte generado ' + new Date().toLocaleString('es-EC'), M, y); y += 7;
+    doc.setTextColor(0);
+
+    doc.setFontSize(9);
+    [['Pipelines', [...state.pipelines].join(', ') || '(ninguno)'],
+     ['Asesores', [...state.advisors].join(', ') || '(ninguno)'],
+     ['Meses', monthsSel.join(', ') || '(ninguno)']].forEach(([k, v]) => {
+      doc.setFont('helvetica', 'bold'); doc.text(k + ':', M, y);
+      doc.setFont('helvetica', 'normal');
+      const lines = doc.splitTextToSize(v, pageW - M * 2 - 22);
+      doc.text(lines, M + 22, y);
+      y += Math.max(lines.length * 4.4, 5);
+    });
+    y += 2;
+
+    const pct = (a, b) => fmtPct(b ? a / b * 100 : 0);
+    const tblOpts = {
+      theme: 'grid', margin: { left: M, right: M },
+      styles: { fontSize: 9, cellPadding: 1.6 },
+      headStyles: { fillColor: RED, textColor: 255, fontStyle: 'bold' },
+      columnStyles: { 1: { halign: 'right' } },
+    };
+
+    doc.autoTable({
+      ...tblOpts, startY: y,
+      head: [['Panorama general (BIO BALANCEADOS + BIOEQUINOS + LEADS + MASCOTAS, solo filtro Mes)', '']],
+      body: [
+        ['Total general de leads', fmtInt(R.fx.total)],
+        ['Asignado (en negociacion)', fmtInt(R.fx.asignado) + '  (' + pct(R.fx.asignado, R.fx.total) + ')'],
+        ['Cerrado (compra)', fmtInt(R.fx.cerrado) + '  (' + pct(R.fx.cerrado, R.fx.total) + ')'],
+        ['% Conversion', pct(R.fx.cerrado, R.fx.total)],
+        ['Valor en compras', fmtUSD(R.fx.opp)],
+        ['Redirigidos a un asesor', fmtInt(R.fx.total - R.fx.bot) + '  (' + pct(R.fx.total - R.fx.bot, R.fx.total) + ')'],
+        ['Sin redirigir (bot)', fmtInt(R.fx.bot) + '  (' + pct(R.fx.bot, R.fx.total) + ')'],
+      ],
+    });
+
+    doc.autoTable({
+      ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+      head: [['Segun filtros seleccionados (Pipeline + Asesor + Mes)', '']],
+      body: [
+        ['Total (filtrado)', fmtInt(R.sums.total)],
+        ['Asignado', fmtInt(R.sums.asignado) + '  (' + pct(R.sums.asignado, R.sums.total) + ')'],
+        ['Nego', fmtInt(R.sums.negado) + '  (' + pct(R.sums.negado, R.sums.total) + ')'],
+        ['Cerrado (compra)', fmtInt(R.sums.cerrado) + '  (' + pct(R.sums.cerrado, R.sums.total) + ')'],
+        ['Descartados', fmtInt(R.sums.descartado) + '  (' + pct(R.sums.descartado, R.sums.total) + ')'],
+        ['% Conversion', pct(R.sums.cerrado, R.sums.total)],
+        ['Valor en compras', fmtUSD(R.sums.opp)],
+      ],
+    });
+
+    doc.autoTable({
+      ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+      head: [['Asesor', 'Total', 'Asignado', 'Nego', 'Cerrado', 'Descart.', '% Conv.', 'Valor cerrado']],
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } },
+      body: R.advisors.map(([name, v]) => [
+        name, fmtInt(v.total), fmtInt(v.asignado), fmtInt(v.negado), fmtInt(v.cerrado),
+        fmtInt(v.descartado), pct(v.cerrado, v.total), fmtUSD(v.opp),
+      ]),
+      foot: [(() => {
+        const t = R.advisors.reduce((a, [, v]) => {
+          ['asignado','negado','cerrado','descartado','total','opp'].forEach(k => a[k] += v[k]); return a;
+        }, { asignado:0, negado:0, cerrado:0, descartado:0, total:0, opp:0 });
+        return ['TOTAL', fmtInt(t.total), fmtInt(t.asignado), fmtInt(t.negado), fmtInt(t.cerrado),
+          fmtInt(t.descartado), pct(t.cerrado, t.total), fmtUSD(t.opp)];
+      })()],
+      footStyles: { fillColor: [240, 240, 237], textColor: 0, fontStyle: 'bold' },
+    });
+
+    const fn = R.funnel;
+    doc.autoTable({
+      ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+      head: [['Embudo (todos los asesores, solo filtro Mes)', '']],
+      body: [
+        ['Todos los leads', fmtInt(fn.total)],
+        ['Asignados (pipeline LEADS)', fmtInt(fn.asignados) + '  (' + pct(fn.asignados, fn.total) + ')'],
+        ['Cerrados (BIO BALANCEADOS + MASCOTAS + BIOEQUINOS)', fmtInt(fn.cerrados) + '  (' + pct(fn.cerrados, fn.total) + ')'],
+      ],
+    });
+
+    doc.setFontSize(7.5); doc.setTextColor(...GREY);
+    doc.text('Fuente: Bitrix24 (crm.deal), todos los pipelines, registros creados en 2026. El mes en curso aparece parcial.',
+      M, doc.internal.pageSize.getHeight() - 8);
+
+    return doc;
+}
+
+async function downloadReport() {
+  const btn = document.getElementById('btn-download');
+  const prev = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Generando…';
+  try {
+    if (!window.jspdf || !window.jspdf.jsPDF || !window.jspdf.jsPDF.API || typeof (new window.jspdf.jsPDF()).autoTable !== 'function') {
+      alert('No se pudo cargar el generador de PDF (jsPDF). Puede ser un bloqueo de red/ad-blocker. Probá recargar, otra red u otro navegador.');
+      return;
+    }
+    let doc;
+    try { doc = buildPdfDoc(); }
+    catch (e) { alert('Error al armar el reporte: ' + ((e && e.message) || e)); return; }
+    const blob = doc.output('blob');
+    const filename = pdfFileName();
+
+    // 1) Dentro de Claude con sesion iniciada: la capacidad "downloads".
+    if (downloadsCap) {
+      try {
+        await downloadsCap.save({ filename, data: blob });
+        return;
+      } catch (e) {
+        if (e && e.code === 'declined') return;
+        alert('Claude no pudo guardar el archivo (' + ((e && e.code) || '?') + '). '
+          + 'Probá abrir el dashboard desde el link publico (no el de claude.ai).');
+        return;
+      }
+    }
+
+    // 2) Pagina normal (GitHub Pages / archivo local): descarga directa del navegador.
+    try {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      return;
+    } catch (e) { /* sigue al fallback */ }
+
+    // 3) Visor de Claude sin sesion: la plataforma bloquea toda descarga.
+    alert('Este visor no permite descargar archivos. Opciones:\n'
+      + '  - Inicia sesion en claude.ai (cuenta gratis) y volve a abrir el link, o\n'
+      + '  - Abri el dashboard desde el link publico que te pasaron (GitHub Pages).');
+  } finally {
+    btn.disabled = false; btn.textContent = prev;
+  }
+}
 </script>
