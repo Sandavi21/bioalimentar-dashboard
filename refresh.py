@@ -143,42 +143,64 @@ META_ACCOUNTS = {
 }
 
 
+def meta_segment(nm):
+    n = (nm or "").lower()
+    b2b, b2c = "b2b" in n, "b2c" in n
+    if b2b and b2c:
+        return "B2B y B2C"
+    if b2b:
+        return "B2B"
+    if b2c:
+        return "B2C"
+    return "Otras"
+
+
 def fetch_meta_rows():
     if not META_TOKEN:
         print("   META_TOKEN no seteado - se omite Meta")
         return None
-    rows = []
+    agg = {}
     for name, act in META_ACCOUNTS.items():
         q = urllib.parse.urlencode({
-            "access_token": META_TOKEN, "level": "account",
+            "access_token": META_TOKEN, "level": "campaign",
             "time_range": '{"since":"2026-01-01","until":"2027-01-01"}',
             "time_increment": "monthly",
-            "fields": "spend,impressions,reach,clicks,actions,date_start", "limit": "500",
+            "fields": "campaign_name,spend,impressions,reach,clicks,actions,date_start", "limit": "500",
         })
+        url = f"https://graph.facebook.com/v23.0/{act}/insights?{q}"
+        n = 0
         try:
-            with urllib.request.urlopen(f"https://graph.facebook.com/v23.0/{act}/insights?{q}", timeout=60) as r:
-                data = json.loads(r.read().decode("utf-8")).get("data", [])
+            while url:
+                with urllib.request.urlopen(url, timeout=90) as r:
+                    j = json.loads(r.read().decode("utf-8"))
+                for rec in j.get("data", []):
+                    n += 1
+                    seg = meta_segment(rec.get("campaign_name"))
+                    key = (act, name, rec["date_start"][:7], seg)
+                    d = agg.setdefault(key, dict(spend=0.0, impressions=0, reach=0, clicks=0, link_clicks=0,
+                                                 leads=0, msg_started=0, reactions=0, comments=0, shares=0, saves=0))
+                    av = {a["action_type"]: float(a["value"]) for a in rec.get("actions", [])}
+                    d["spend"] += float(rec.get("spend", 0))
+                    d["impressions"] += int(float(rec.get("impressions", 0)))
+                    d["reach"] += int(float(rec.get("reach", 0)))
+                    d["clicks"] += int(float(rec.get("clicks", 0)))
+                    d["link_clicks"] += int(av.get("link_click", 0))
+                    d["leads"] += int(av.get("lead", 0))
+                    d["msg_started"] += int(av.get("onsite_conversion.messaging_conversation_started_7d", 0))
+                    d["reactions"] += int(av.get("post_reaction", 0))
+                    d["comments"] += int(av.get("comment", 0))
+                    d["shares"] += int(av.get("post", 0))
+                    d["saves"] += int(av.get("onsite_conversion.post_save", 0))
+                url = j.get("paging", {}).get("next")
         except Exception as e:  # noqa: BLE001
             print(f"   {name}: ERROR {e}")
             continue
-        for rec in data:
-            av = {a["action_type"]: float(a["value"]) for a in rec.get("actions", [])}
-            rows.append({
-                "account_id": act, "account_name": name, "month": rec["date_start"][:7],
-                "spend": round(float(rec.get("spend", 0)), 2),
-                "impressions": int(float(rec.get("impressions", 0))),
-                "reach": int(float(rec.get("reach", 0))),
-                "clicks": int(float(rec.get("clicks", 0))),
-                "link_clicks": int(av.get("link_click", 0)),
-                "leads": int(av.get("lead", 0)),
-                "msg_started": int(av.get("onsite_conversion.messaging_conversation_started_7d", 0)),
-                "reactions": int(av.get("post_reaction", 0)),
-                "comments": int(av.get("comment", 0)),
-                "shares": int(av.get("post", 0)),
-                "saves": int(av.get("onsite_conversion.post_save", 0)),
-            })
-        print(f"   {name}: {len(data)} meses")
-    rows.sort(key=lambda x: (x["account_name"], x["month"]))
+        print(f"   {name}: {n} campanias-mes")
+    rows = []
+    for (aid, aname, mon, seg), d in agg.items():
+        d["spend"] = round(d["spend"], 2)
+        rows.append(dict(account_id=aid, account_name=aname, month=mon, segment=seg, **d))
+    rows.sort(key=lambda x: (x["account_name"], x["month"], x["segment"]))
     return rows
 
 

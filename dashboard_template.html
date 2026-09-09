@@ -442,7 +442,15 @@
 
   <div id="meta-section" style="margin-top:34px;">
     <div class="section-title">Meta Ads · Pauta digital</div>
-    <div class="section-sub">Facebook/Instagram — 10 cuentas publicitarias del Business Manager · respeta solo el filtro de Mes (no Pipeline ni Asesor)</div>
+    <div class="section-sub" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <span id="meta-sub-label">Facebook/Instagram · 10 cuentas del Business Manager · segmento según el nombre de la campaña · respeta solo el filtro de Mes</span>
+      <div class="view-toggle" id="meta-seg-toggle">
+        <button data-seg="B2B" class="active" onclick="setMetaSeg('B2B')">B2B</button>
+        <button data-seg="B2C" onclick="setMetaSeg('B2C')">B2C</button>
+        <button data-seg="Otras" onclick="setMetaSeg('Otras')">Otras</button>
+        <button data-seg="Todas" onclick="setMetaSeg('Todas')">Todas</button>
+      </div>
+    </div>
     <div class="kpi-grid">
       <div class="kpi" style="--accent:var(--brand-red)">
         <div class="label">Gasto en pauta</div>
@@ -460,7 +468,7 @@
         <div class="sub">personas alcanzadas por mes, sumadas</div>
       </div>
       <div class="kpi" style="--accent:var(--series-cerrado)">
-        <div class="label">Clics en enlace</div>
+        <div class="label">Clics en botón de redirección</div>
         <div class="value" id="m-clicks">—</div>
         <div class="sub" id="m-cpc">—</div>
       </div>
@@ -996,7 +1004,16 @@ function refresh() {
 }
 
 // ================= Meta Ads =================
-function getMetaRows() { return META.filter(d => state.months.has(d.month)); }
+let metaSeg = 'B2B';
+const META_HAS_SEG = Array.isArray(META) && META.some(d => d.segment);
+function setMetaSeg(s) {
+  metaSeg = s;
+  document.querySelectorAll('#meta-seg-toggle button').forEach(b => b.classList.toggle('active', b.dataset.seg === s));
+  renderMeta();
+}
+function getMetaRows() {
+  return META.filter(d => state.months.has(d.month) && (metaSeg === 'Todas' || !d.segment || d.segment === metaSeg));
+}
 
 function metaTotals(rows) {
   const T = { spend:0, impressions:0, reach:0, clicks:0, link_clicks:0, leads:0, msg_started:0, reactions:0, comments:0, shares:0, saves:0 };
@@ -1008,16 +1025,18 @@ function renderMeta() {
   const section = document.getElementById('meta-section');
   if (!Array.isArray(META) || META.length === 0) { section.style.display = 'none'; return; }
   section.style.display = '';
+  document.getElementById('meta-seg-toggle').style.display = META_HAS_SEG ? '' : 'none';
 
   const rows = getMetaRows();
   const T = metaTotals(rows);
   const cpm = T.impressions ? T.spend / T.impressions * 1000 : 0;
-  const cpc = T.clicks ? T.spend / T.clicks : 0;
+  const cpc = (T.link_clicks || T.clicks) ? T.spend / (T.link_clicks || T.clicks) : 0;
   const cpMsg = T.msg_started ? T.spend / T.msg_started : 0;
   const cpl = T.leads ? T.spend / T.leads : 0;
+  const segTxt = META_HAS_SEG ? (metaSeg === 'Todas' ? 'todas las campañas' : 'campañas ' + metaSeg) : '';
 
   document.getElementById('m-spend').textContent = fmtUSD(T.spend);
-  document.getElementById('m-spend-sub').textContent = rows.length ? (uniq(rows.map(r => r.account_name)).length + ' cuentas con actividad') : 'sin gasto en el período';
+  document.getElementById('m-spend-sub').textContent = rows.length ? (segTxt + ' · ' + uniq(rows.map(r => r.account_name)).length + ' cuentas') : 'sin gasto en el período';
   document.getElementById('m-impr').textContent = fmtInt(T.impressions);
   document.getElementById('m-cpm').textContent = 'CPM ' + fmtUSD(cpm);
   document.getElementById('m-reach').textContent = fmtInt(T.reach);
@@ -1065,7 +1084,7 @@ function renderMeta() {
     Object.keys(acc[r.account_name]).forEach(k => acc[r.account_name][k] += (r[k] || 0));
   });
   const al = Object.entries(acc).filter(([, v]) => v.spend > 0 || v.impressions > 0).sort((a, b) => b[1].spend - a[1].spend);
-  let html = '<table class="datatable"><thead><tr><th>Cuenta</th><th>Gasto</th><th>Impresiones</th><th>Alcance</th><th>Clics enlace</th><th>CTR</th><th>CPM</th><th>Convers.</th><th>Costo/conv.</th><th>Leads</th></tr></thead><tbody>';
+  let html = '<table class="datatable"><thead><tr><th>Cuenta</th><th>Gasto</th><th>Impresiones</th><th>Alcance</th><th>Clics botón</th><th>CTR</th><th>CPM</th><th>Convers.</th><th>Costo/conv.</th><th>Leads</th></tr></thead><tbody>';
   al.forEach(([name, v]) => {
     const ctr = v.impressions ? (v.clicks / v.impressions * 100) : 0;
     const m = v.impressions ? (v.spend / v.impressions * 1000) : 0;
@@ -1265,7 +1284,7 @@ function buildPdfDoc() {
       const ml = Object.entries(macc).filter(([, v]) => v.spend > 0 || v.impressions > 0).sort((a, b) => b[1].spend - a[1].spend);
       doc.autoTable({
         ...tblOpts, startY: doc.lastAutoTable.finalY + 7,
-        head: [['Meta Ads - cuenta', 'Gasto', 'Impresiones', 'Clics enlace', 'Convers.', 'Leads']],
+        head: [['Meta Ads' + (META_HAS_SEG ? ' (' + metaSeg + ')' : '') + ' - cuenta', 'Gasto', 'Impresiones', 'Clics boton', 'Convers.', 'Leads']],
         columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' } },
         body: ml.map(([name, v]) => [name, fmtUSD(v.spend), fmtInt(v.impressions), fmtInt(v.link_clicks || v.clicks), fmtInt(v.msg_started), fmtInt(v.leads)]),
         foot: [['TOTAL', fmtUSD(mt.spend), fmtInt(mt.impressions), fmtInt(mt.link_clicks || mt.clicks), fmtInt(mt.msg_started), fmtInt(mt.leads)]],
