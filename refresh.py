@@ -129,6 +129,59 @@ def fetch_all_users():
     return all_users
 
 
+# --- Meta Ads (Facebook / Instagram) --------------------------------------
+# Token "system user" del Business Manager, solo lectura. Se pasa por env var
+# META_TOKEN (no se escribe en el repo). Si no esta o falla, se conserva el
+# meta_aggregated.json anterior.
+META_TOKEN = os.environ.get("META_TOKEN")
+META_ACCOUNTS = {
+    "Huevos BiO": "act_1292657021565350", "BAAS Online": "act_582430103888946",
+    "Gatuco - Mambo Dog": "act_1757551604701944", "Nutritec CAT": "act_1306288546964338",
+    "IXINA": "act_276959628021450", "BiOAlimentar": "act_3184256551865420",
+    "CANimentos": "act_450916280410270", "IXINA Gye": "act_389851926660947",
+    "BiO Balanceados": "act_615667173527689", "BiO Equinos": "act_2331081347042919",
+}
+
+
+def fetch_meta_rows():
+    if not META_TOKEN:
+        print("   META_TOKEN no seteado - se omite Meta")
+        return None
+    rows = []
+    for name, act in META_ACCOUNTS.items():
+        q = urllib.parse.urlencode({
+            "access_token": META_TOKEN, "level": "account",
+            "time_range": '{"since":"2026-01-01","until":"2027-01-01"}',
+            "time_increment": "monthly",
+            "fields": "spend,impressions,reach,clicks,actions,date_start", "limit": "500",
+        })
+        try:
+            with urllib.request.urlopen(f"https://graph.facebook.com/v23.0/{act}/insights?{q}", timeout=60) as r:
+                data = json.loads(r.read().decode("utf-8")).get("data", [])
+        except Exception as e:  # noqa: BLE001
+            print(f"   {name}: ERROR {e}")
+            continue
+        for rec in data:
+            av = {a["action_type"]: float(a["value"]) for a in rec.get("actions", [])}
+            rows.append({
+                "account_id": act, "account_name": name, "month": rec["date_start"][:7],
+                "spend": round(float(rec.get("spend", 0)), 2),
+                "impressions": int(float(rec.get("impressions", 0))),
+                "reach": int(float(rec.get("reach", 0))),
+                "clicks": int(float(rec.get("clicks", 0))),
+                "link_clicks": int(av.get("link_click", 0)),
+                "leads": int(av.get("lead", 0)),
+                "msg_started": int(av.get("onsite_conversion.messaging_conversation_started_7d", 0)),
+                "reactions": int(av.get("post_reaction", 0)),
+                "comments": int(av.get("comment", 0)),
+                "shares": int(av.get("post", 0)),
+                "saves": int(av.get("onsite_conversion.post_save", 0)),
+            })
+        print(f"   {name}: {len(data)} meses")
+    rows.sort(key=lambda x: (x["account_name"], x["month"]))
+    return rows
+
+
 def main():
     print("1-2/4 Descargando deals y usuarios de Bitrix24...")
     deals = fetch_all_deals()
@@ -171,6 +224,18 @@ def main():
     with open(os.path.join(ROOT, "data", "aggregated.json"), "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
+    print("Descargando Meta Ads insights...")
+    meta_path = os.path.join(ROOT, "data", "meta_aggregated.json")
+    meta_rows = fetch_meta_rows()
+    if meta_rows:
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump(meta_rows, f, ensure_ascii=False, indent=1)
+        print(f"   {len(meta_rows)} filas de Meta guardadas")
+    elif not os.path.exists(meta_path):
+        with open(meta_path, "w", encoding="utf-8") as f:
+            f.write("[]")
+    meta_compact = open(meta_path, encoding="utf-8").read().strip() or "[]"
+
     print("4/4 Regenerando dashboard.html...")
     with open(os.path.join(ROOT, "dashboard_template.html"), "r", encoding="utf-8") as f:
         template = f.read()
@@ -178,7 +243,9 @@ def main():
         logo_b64 = base64.b64encode(f.read()).decode("ascii")
 
     compact = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
+    meta_compact = json.dumps(json.loads(meta_compact), ensure_ascii=False, separators=(",", ":"))
     final = (template.replace("/*__LEADS_DATA__*/", compact)
+                      .replace("/*__META_DATA__*/", meta_compact)
                       .replace("/*__LOGO_B64__*/", logo_b64)
                       .replace("/*__GENERATED_AT__*/", formatted_now_ecuador()))
     with open(os.path.join(ROOT, "dashboard.html"), "w", encoding="utf-8") as f:

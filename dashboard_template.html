@@ -291,7 +291,7 @@
         <span class="eyebrow">CRM · Leads x Asesor</span>
       </div>
       <h1>Leads x Asesor</h1>
-      <p>Datos de Bitrix24 (todos los pipelines), año 2026 · actualizado el /*__GENERATED_AT__*/ · el mes en curso aparece parcial.</p>
+      <p>Datos de Bitrix24 (todos los pipelines) + Meta Ads · año 2026 · actualizado el /*__GENERATED_AT__*/ · el mes en curso aparece parcial.</p>
     </div>
     <div class="theme-toggle" id="theme-toggle">
       <button data-mode="light" onclick="setTheme('light')">Claro</button>
@@ -440,6 +440,54 @@
   <button class="table-toggle" id="table-toggle" onclick="toggleTable()">Ver tabla de datos ▾</button>
   <div id="table-wrap" style="display:none;"></div>
 
+  <div id="meta-section" style="margin-top:34px;">
+    <div class="section-title">Meta Ads · Pauta digital</div>
+    <div class="section-sub">Facebook/Instagram — 10 cuentas publicitarias del Business Manager · respeta solo el filtro de Mes (no Pipeline ni Asesor)</div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--accent:var(--brand-red)">
+        <div class="label">Gasto en pauta</div>
+        <div class="value" id="m-spend">—</div>
+        <div class="sub" id="m-spend-sub">—</div>
+      </div>
+      <div class="kpi" style="--accent:var(--series-asignado)">
+        <div class="label">Impresiones</div>
+        <div class="value" id="m-impr">—</div>
+        <div class="sub" id="m-cpm">—</div>
+      </div>
+      <div class="kpi" style="--accent:var(--series-asignado)">
+        <div class="label">Alcance (suma mensual)</div>
+        <div class="value" id="m-reach">—</div>
+        <div class="sub">personas alcanzadas por mes, sumadas</div>
+      </div>
+      <div class="kpi" style="--accent:var(--series-cerrado)">
+        <div class="label">Clics en enlace</div>
+        <div class="value" id="m-clicks">—</div>
+        <div class="sub" id="m-cpc">—</div>
+      </div>
+      <div class="kpi" style="--accent:var(--brand-red)">
+        <div class="label">Conversaciones iniciadas</div>
+        <div class="value" id="m-msg">—</div>
+        <div class="sub" id="m-cpm-msg">—</div>
+      </div>
+      <div class="kpi" style="--accent:var(--series-cerrado)">
+        <div class="label">Leads de formulario</div>
+        <div class="value" id="m-leads">—</div>
+        <div class="sub" id="m-cpl">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Gasto por cuenta publicitaria</div>
+      <div class="section-sub">Inversión total en los meses seleccionados</div>
+      <div id="chart-meta-spend"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="section-title">Detalle por cuenta</div>
+      <div id="meta-table"></div>
+    </div>
+  </div>
+
   <div class="card glossary">
     <b>Panorama general vs. filtros</b> — las tarjetas de arriba están fijas a los 4 pipelines de venta real
     (<b>BIO BALANCEADOS, BIOEQUINOS, LEADS, MASCOTAS</b>) y a todos los asesores; no cambian con los filtros de Pipeline
@@ -467,6 +515,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script>
 const DATA = /*__LEADS_DATA__*/;
+const META = /*__META_DATA__*/;
 const GENERATED_AT = "/*__GENERATED_AT__*/";
 
 const BUCKET_COLOR = { asignado: 'var(--series-asignado)', negado: 'var(--series-negado)', cerrado: 'var(--series-cerrado)', descartado: 'var(--series-descartado)' };
@@ -943,6 +992,89 @@ function refresh() {
   renderPipelineChart(rows);
   renderTable(rows);
   renderPipelineFunnel(fixedRows);
+  renderMeta();
+}
+
+// ================= Meta Ads =================
+function getMetaRows() { return META.filter(d => state.months.has(d.month)); }
+
+function metaTotals(rows) {
+  const T = { spend:0, impressions:0, reach:0, clicks:0, link_clicks:0, leads:0, msg_started:0, reactions:0, comments:0, shares:0, saves:0 };
+  rows.forEach(r => Object.keys(T).forEach(k => T[k] += (r[k] || 0)));
+  return T;
+}
+
+function renderMeta() {
+  const section = document.getElementById('meta-section');
+  if (!Array.isArray(META) || META.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const rows = getMetaRows();
+  const T = metaTotals(rows);
+  const cpm = T.impressions ? T.spend / T.impressions * 1000 : 0;
+  const cpc = T.clicks ? T.spend / T.clicks : 0;
+  const cpMsg = T.msg_started ? T.spend / T.msg_started : 0;
+  const cpl = T.leads ? T.spend / T.leads : 0;
+
+  document.getElementById('m-spend').textContent = fmtUSD(T.spend);
+  document.getElementById('m-spend-sub').textContent = rows.length ? (uniq(rows.map(r => r.account_name)).length + ' cuentas con actividad') : 'sin gasto en el período';
+  document.getElementById('m-impr').textContent = fmtInt(T.impressions);
+  document.getElementById('m-cpm').textContent = 'CPM ' + fmtUSD(cpm);
+  document.getElementById('m-reach').textContent = fmtInt(T.reach);
+  document.getElementById('m-clicks').textContent = fmtInt(T.link_clicks || T.clicks);
+  document.getElementById('m-cpc').textContent = 'CPC ' + (cpc ? '$' + cpc.toFixed(2) : '—');
+  document.getElementById('m-msg').textContent = fmtInt(T.msg_started);
+  document.getElementById('m-cpm-msg').textContent = cpMsg ? ('$' + cpMsg.toFixed(2) + ' por conversación') : '—';
+  document.getElementById('m-leads').textContent = fmtInt(T.leads);
+  document.getElementById('m-cpl').textContent = cpl ? ('$' + cpl.toFixed(2) + ' por lead') : '—';
+
+  // --- barras horizontales: gasto por cuenta ---
+  const cont = document.getElementById('chart-meta-spend');
+  cont.innerHTML = '';
+  const byAcc = {};
+  rows.forEach(r => { byAcc[r.account_name] = (byAcc[r.account_name] || 0) + r.spend; });
+  const list = Object.entries(byAcc).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  if (!list.length) { cont.innerHTML = '<div class="empty-state">Sin gasto de Meta para el mes seleccionado.</div>'; }
+  else {
+    const max = Math.max(...list.map(l => l[1]));
+    const barAreaW = (cont.clientWidth || 900) - 210;
+    list.forEach(([name, val]) => {
+      const row = document.createElement('div'); row.className = 'bar-row';
+      const nm = document.createElement('div'); nm.className = 'name'; nm.textContent = name; nm.title = name;
+      row.appendChild(nm);
+      const track = document.createElement('div'); track.className = 'track';
+      const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+      const w = Math.max((val / max) * (barAreaW - 70), 2);
+      const rect = svgEl('rect', { x: 0, y: 1, width: w, height: 20, rx: 4, fill: 'var(--series-total)' });
+      rect.addEventListener('mousemove', (e) => showTip(e, name, [['Gasto', fmtUSD(val)]]));
+      rect.addEventListener('mouseleave', hideTip);
+      svg.appendChild(rect);
+      const lbl = svgEl('text', { x: w + 6, y: 15, class: 'axis-label', fill: 'var(--text-secondary)' });
+      lbl.textContent = fmtUSD(val);
+      svg.appendChild(lbl);
+      track.appendChild(svg);
+      row.appendChild(track);
+      cont.appendChild(row);
+    });
+  }
+
+  // --- tabla por cuenta ---
+  const acc = {};
+  rows.forEach(r => {
+    if (!acc[r.account_name]) acc[r.account_name] = { spend:0, impressions:0, reach:0, clicks:0, link_clicks:0, leads:0, msg_started:0 };
+    Object.keys(acc[r.account_name]).forEach(k => acc[r.account_name][k] += (r[k] || 0));
+  });
+  const al = Object.entries(acc).filter(([, v]) => v.spend > 0 || v.impressions > 0).sort((a, b) => b[1].spend - a[1].spend);
+  let html = '<table class="datatable"><thead><tr><th>Cuenta</th><th>Gasto</th><th>Impresiones</th><th>Alcance</th><th>Clics enlace</th><th>CTR</th><th>CPM</th><th>Convers.</th><th>Costo/conv.</th><th>Leads</th></tr></thead><tbody>';
+  al.forEach(([name, v]) => {
+    const ctr = v.impressions ? (v.clicks / v.impressions * 100) : 0;
+    const m = v.impressions ? (v.spend / v.impressions * 1000) : 0;
+    const cc = v.msg_started ? (v.spend / v.msg_started) : 0;
+    html += `<tr><td>${name}</td><td>${fmtUSD(v.spend)}</td><td>${fmtInt(v.impressions)}</td><td>${fmtInt(v.reach)}</td><td>${fmtInt(v.link_clicks || v.clicks)}</td><td>${fmtPct(ctr)}</td><td>${fmtUSD(m)}</td><td>${fmtInt(v.msg_started)}</td><td>${cc ? '$' + cc.toFixed(2) : '—'}</td><td>${fmtInt(v.leads)}</td></tr>`;
+  });
+  html += `<tr style="font-weight:700;border-top:2px solid var(--baseline);"><td>TOTAL</td><td>${fmtUSD(T.spend)}</td><td>${fmtInt(T.impressions)}</td><td>${fmtInt(T.reach)}</td><td>${fmtInt(T.link_clicks || T.clicks)}</td><td>${fmtPct(T.impressions ? T.clicks / T.impressions * 100 : 0)}</td><td>${fmtUSD(cpm)}</td><td>${fmtInt(T.msg_started)}</td><td>${cpMsg ? '$' + cpMsg.toFixed(2) : '—'}</td><td>${fmtInt(T.leads)}</td></tr>`;
+  html += '</tbody></table>';
+  document.getElementById('meta-table').innerHTML = html;
 }
 
 function setTheme(mode) {
@@ -1121,8 +1253,28 @@ function buildPdfDoc() {
       ],
     });
 
+    // --- Meta Ads ---
+    if (Array.isArray(META) && META.length) {
+      const mr = getMetaRows();
+      const mt = metaTotals(mr);
+      const macc = {};
+      mr.forEach(r => {
+        if (!macc[r.account_name]) macc[r.account_name] = { spend:0, impressions:0, clicks:0, link_clicks:0, msg_started:0, leads:0 };
+        Object.keys(macc[r.account_name]).forEach(k => macc[r.account_name][k] += (r[k] || 0));
+      });
+      const ml = Object.entries(macc).filter(([, v]) => v.spend > 0 || v.impressions > 0).sort((a, b) => b[1].spend - a[1].spend);
+      doc.autoTable({
+        ...tblOpts, startY: doc.lastAutoTable.finalY + 7,
+        head: [['Meta Ads - cuenta', 'Gasto', 'Impresiones', 'Clics enlace', 'Convers.', 'Leads']],
+        columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' } },
+        body: ml.map(([name, v]) => [name, fmtUSD(v.spend), fmtInt(v.impressions), fmtInt(v.link_clicks || v.clicks), fmtInt(v.msg_started), fmtInt(v.leads)]),
+        foot: [['TOTAL', fmtUSD(mt.spend), fmtInt(mt.impressions), fmtInt(mt.link_clicks || mt.clicks), fmtInt(mt.msg_started), fmtInt(mt.leads)]],
+        footStyles: { fillColor: [240, 240, 237], textColor: 0, fontStyle: 'bold' },
+      });
+    }
+
     doc.setFontSize(7.5); doc.setTextColor(...GREY);
-    doc.text('Fuente: Bitrix24 (crm.deal), todos los pipelines, registros creados en 2026. El mes en curso aparece parcial.',
+    doc.text('Fuente: Bitrix24 (crm.deal) + Meta Ads (Graph API, insights por cuenta). Registros de 2026; el mes en curso aparece parcial.',
       M, doc.internal.pageSize.getHeight() - 8);
 
     return doc;
