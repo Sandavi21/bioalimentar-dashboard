@@ -159,7 +159,7 @@ def fetch_meta_rows():
     if not META_TOKEN:
         print("   META_TOKEN no seteado - se omite Meta")
         return None
-    agg = {}
+    rows = []
     for name, act in META_ACCOUNTS.items():
         q = urllib.parse.urlencode({
             "access_token": META_TOKEN, "level": "campaign",
@@ -175,32 +175,30 @@ def fetch_meta_rows():
                     j = json.loads(r.read().decode("utf-8"))
                 for rec in j.get("data", []):
                     n += 1
-                    seg = meta_segment(rec.get("campaign_name"))
-                    key = (act, name, rec["date_start"][:7], seg)
-                    d = agg.setdefault(key, dict(spend=0.0, impressions=0, reach=0, clicks=0, link_clicks=0,
-                                                 leads=0, msg_started=0, reactions=0, comments=0, shares=0, saves=0))
                     av = {a["action_type"]: float(a["value"]) for a in rec.get("actions", [])}
-                    d["spend"] += float(rec.get("spend", 0))
-                    d["impressions"] += int(float(rec.get("impressions", 0)))
-                    d["reach"] += int(float(rec.get("reach", 0)))
-                    d["clicks"] += int(float(rec.get("clicks", 0)))
-                    d["link_clicks"] += int(av.get("link_click", 0))
-                    d["leads"] += int(av.get("lead", 0))
-                    d["msg_started"] += int(av.get("onsite_conversion.messaging_conversation_started_7d", 0))
-                    d["reactions"] += int(av.get("post_reaction", 0))
-                    d["comments"] += int(av.get("comment", 0))
-                    d["shares"] += int(av.get("post", 0))
-                    d["saves"] += int(av.get("onsite_conversion.post_save", 0))
+                    rows.append({
+                        "account_id": act, "account_name": name,
+                        "campaign_name": rec.get("campaign_name", ""),
+                        "segment": meta_segment(rec.get("campaign_name")),
+                        "month": rec["date_start"][:7],
+                        "spend": round(float(rec.get("spend", 0)), 2),
+                        "impressions": int(float(rec.get("impressions", 0))),
+                        "reach": int(float(rec.get("reach", 0))),
+                        "clicks": int(float(rec.get("clicks", 0))),
+                        "link_clicks": int(av.get("link_click", 0)),
+                        "leads": int(av.get("lead", 0)),
+                        "msg_started": int(av.get("onsite_conversion.messaging_conversation_started_7d", 0)),
+                        "reactions": int(av.get("post_reaction", 0)),
+                        "comments": int(av.get("comment", 0)),
+                        "shares": int(av.get("post", 0)),
+                        "saves": int(av.get("onsite_conversion.post_save", 0)),
+                    })
                 url = j.get("paging", {}).get("next")
         except Exception as e:  # noqa: BLE001
             print(f"   {name}: ERROR {e}")
             continue
         print(f"   {name}: {n} campanias-mes")
-    rows = []
-    for (aid, aname, mon, seg), d in agg.items():
-        d["spend"] = round(d["spend"], 2)
-        rows.append(dict(account_id=aid, account_name=aname, month=mon, segment=seg, **d))
-    rows.sort(key=lambda x: (x["account_name"], x["month"], x["segment"]))
+    rows.sort(key=lambda x: (x["account_name"], x["campaign_name"], x["month"]))
     return rows
 
 

@@ -442,14 +442,21 @@
 
   <div id="meta-section" style="margin-top:34px;">
     <div class="section-title">Meta Ads · Pauta digital</div>
-    <div class="section-sub" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-      <span id="meta-sub-label">Facebook/Instagram · 10 cuentas del Business Manager · segmento según el nombre de la campaña · respeta solo el filtro de Mes</span>
+    <div class="section-sub">Facebook/Instagram · Graph API · el segmento (B2B/B2C) sale del nombre de la campaña · respeta el filtro de Mes</div>
+    <div class="filterbar card" style="margin:12px 0 18px;">
+      <span class="fb-label">Segmento</span>
       <div class="view-toggle" id="meta-seg-toggle">
         <button data-seg="B2B" class="active" onclick="setMetaSeg('B2B')">B2B</button>
         <button data-seg="B2C" onclick="setMetaSeg('B2C')">B2C</button>
         <button data-seg="Otras" onclick="setMetaSeg('Otras')">Otras</button>
         <button data-seg="Todas" onclick="setMetaSeg('Todas')">Todas</button>
       </div>
+      <span class="fb-label" style="margin-left:8px;">Cuenta</span>
+      <div class="combo" id="combo-meta-acc">
+        <button class="combo-btn" onclick="toggleCombo('combo-meta-acc')"><span id="lbl-meta-acc">Todas</span> <span class="car">▾</span></button>
+        <div class="combo-panel" id="panel-meta-acc"></div>
+      </div>
+      <span class="fb-summary" id="meta-fb-summary"></span>
     </div>
     <div class="kpi-grid">
       <div class="kpi" style="--accent:var(--brand-red)">
@@ -493,6 +500,13 @@
     <div class="card" style="margin-top:16px;">
       <div class="section-title">Detalle por cuenta</div>
       <div id="meta-table"></div>
+    </div>
+
+    <button class="table-toggle" id="meta-camp-toggle" onclick="toggleMetaCamp()">Ver campañas (una fila por campaña) ▾</button>
+    <div id="meta-camp-wrap" style="display:none;">
+      <input id="meta-camp-search" type="text" placeholder="Buscar campaña…" oninput="renderMetaCampaigns()"
+        style="margin:10px 0;padding:7px 10px;width:100%;max-width:320px;font:inherit;font-size:13px;border:1px solid var(--border);border-radius:8px;background:var(--surface-1);color:var(--text-primary);">
+      <div id="meta-camp-table" style="overflow-x:auto;"></div>
     </div>
   </div>
 
@@ -547,13 +561,15 @@ const LINE_STYLES = [
 
 function uniq(arr) { return [...new Set(arr)]; }
 const ALL_MONTHS = uniq(DATA.map(d => d.month)).sort();
+const META_ACCOUNTS_LIST = (Array.isArray(META) ? uniq(META.map(d => d.account_name)) : []).sort();
 
 // Por defecto solo los 4 pipelines de venta real y los 2 asesores humanos activos
 // (pedido explícito del usuario); se pueden marcar los demás a mano en los filtros.
 let state = {
   pipelines: new Set(PANORAMA_PIPELINES),
   advisors: new Set(DEFAULT_ADVISORS),
-  months: new Set(ALL_MONTHS)
+  months: new Set(ALL_MONTHS),
+  metaAccounts: new Set(META_ACCOUNTS_LIST)
 };
 
 function buildCombo(panelId, lblId, items, stateKey) {
@@ -585,6 +601,7 @@ function buildCombo(panelId, lblId, items, stateKey) {
 buildCombo('panel-pipeline','lbl-pipeline', PANORAMA_PIPELINES, 'pipelines');
 buildCombo('panel-advisor','lbl-advisor', DEFAULT_ADVISORS, 'advisors');
 buildCombo('panel-month','lbl-month', ALL_MONTHS, 'months');
+if (META_ACCOUNTS_LIST.length) buildCombo('panel-meta-acc','lbl-meta-acc', META_ACCOUNTS_LIST, 'metaAccounts');
 
 function toggleCombo(id) {
   const el = document.getElementById(id);
@@ -597,7 +614,7 @@ document.addEventListener('click', (e) => {
 });
 
 function resetFilters() {
-  state = { pipelines: new Set(PANORAMA_PIPELINES), advisors: new Set(DEFAULT_ADVISORS), months: new Set(ALL_MONTHS) };
+  state = { pipelines: new Set(PANORAMA_PIPELINES), advisors: new Set(DEFAULT_ADVISORS), months: new Set(ALL_MONTHS), metaAccounts: new Set(META_ACCOUNTS_LIST) };
   document.querySelectorAll('.combo-panel input[type=checkbox]').forEach(cb => {
     cb.checked = state[cb.dataset.statekey].has(cb.dataset.item);
   });
@@ -1012,7 +1029,40 @@ function setMetaSeg(s) {
   renderMeta();
 }
 function getMetaRows() {
-  return META.filter(d => state.months.has(d.month) && (metaSeg === 'Todas' || !d.segment || d.segment === metaSeg));
+  return META.filter(d => state.months.has(d.month)
+    && state.metaAccounts.has(d.account_name)
+    && (metaSeg === 'Todas' || !d.segment || d.segment === metaSeg));
+}
+function toggleMetaCamp() {
+  const w = document.getElementById('meta-camp-wrap');
+  const b = document.getElementById('meta-camp-toggle');
+  const show = w.style.display === 'none';
+  w.style.display = show ? 'block' : 'none';
+  b.textContent = show ? 'Ocultar campañas ▴' : 'Ver campañas (una fila por campaña) ▾';
+  if (show) renderMetaCampaigns();
+}
+function renderMetaCampaigns() {
+  const q = (document.getElementById('meta-camp-search').value || '').toLowerCase().trim();
+  const byC = {};
+  getMetaRows().forEach(r => {
+    const k = r.account_name + ' ‖ ' + r.campaign_name;
+    if (!byC[k]) byC[k] = { account: r.account_name, campaign: r.campaign_name, segment: r.segment || '—', spend:0, impressions:0, reach:0, link_clicks:0, clicks:0, msg_started:0, leads:0 };
+    ['spend','impressions','reach','link_clicks','clicks','msg_started','leads'].forEach(m => byC[k][m] += (r[m] || 0));
+  });
+  let list = Object.values(byC).filter(v => v.spend > 0 || v.impressions > 0);
+  if (q) list = list.filter(v => (v.campaign + ' ' + v.account + ' ' + v.segment).toLowerCase().includes(q));
+  list.sort((a, b) => b.spend - a.spend);
+  const tot = list.reduce((a, v) => { ['spend','impressions','reach','link_clicks','msg_started','leads'].forEach(m => a[m] += v[m]); return a; },
+    { spend:0, impressions:0, reach:0, link_clicks:0, msg_started:0, leads:0 });
+  let html = '<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">' + list.length + ' campañas · ' + fmtUSD(tot.spend) + ' de gasto</div>';
+  html += '<table class="datatable"><thead><tr><th>Campaña</th><th>Cuenta</th><th>Seg.</th><th>Gasto</th><th>Impresiones</th><th>Alcance</th><th>Clics botón</th><th>Convers.</th><th>Leads</th></tr></thead><tbody>';
+  list.slice(0, 400).forEach(v => {
+    html += `<tr><td style="max-width:340px;white-space:normal;">${v.campaign.replace(/</g,'&lt;')}</td><td>${v.account}</td><td>${v.segment}</td><td>${fmtUSD(v.spend)}</td><td>${fmtInt(v.impressions)}</td><td>${fmtInt(v.reach)}</td><td>${fmtInt(v.link_clicks)}</td><td>${fmtInt(v.msg_started)}</td><td>${fmtInt(v.leads)}</td></tr>`;
+  });
+  html += `<tr style="font-weight:700;border-top:2px solid var(--baseline);"><td>TOTAL (${list.length})</td><td></td><td></td><td>${fmtUSD(tot.spend)}</td><td>${fmtInt(tot.impressions)}</td><td>${fmtInt(tot.reach)}</td><td>${fmtInt(tot.link_clicks)}</td><td>${fmtInt(tot.msg_started)}</td><td>${fmtInt(tot.leads)}</td></tr>`;
+  html += '</tbody></table>';
+  if (list.length > 400) html += '<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Mostrando las 400 de mayor gasto — usá el buscador para acotar.</div>';
+  document.getElementById('meta-camp-table').innerHTML = html;
 }
 
 function metaTotals(rows) {
@@ -1034,6 +1084,11 @@ function renderMeta() {
   const cpMsg = T.msg_started ? T.spend / T.msg_started : 0;
   const cpl = T.leads ? T.spend / T.leads : 0;
   const segTxt = META_HAS_SEG ? (metaSeg === 'Todas' ? 'todas las campañas' : 'campañas ' + metaSeg) : '';
+
+  const accLbl = document.getElementById('lbl-meta-acc');
+  if (accLbl) accLbl.textContent = state.metaAccounts.size === META_ACCOUNTS_LIST.length ? 'Todas' : state.metaAccounts.size + '/' + META_ACCOUNTS_LIST.length;
+  const metaSummary = document.getElementById('meta-fb-summary');
+  if (metaSummary) metaSummary.textContent = fmtUSD(T.spend) + ' de gasto · ' + uniq(rows.map(r => r.campaign_name)).length + ' campañas';
 
   document.getElementById('m-spend').textContent = fmtUSD(T.spend);
   document.getElementById('m-spend-sub').textContent = rows.length ? (segTxt + ' · ' + uniq(rows.map(r => r.account_name)).length + ' cuentas') : 'sin gasto en el período';
@@ -1094,6 +1149,8 @@ function renderMeta() {
   html += `<tr style="font-weight:700;border-top:2px solid var(--baseline);"><td>TOTAL</td><td>${fmtUSD(T.spend)}</td><td>${fmtInt(T.impressions)}</td><td>${fmtInt(T.reach)}</td><td>${fmtInt(T.link_clicks || T.clicks)}</td><td>${fmtPct(T.impressions ? T.clicks / T.impressions * 100 : 0)}</td><td>${fmtUSD(cpm)}</td><td>${fmtInt(T.msg_started)}</td><td>${cpMsg ? '$' + cpMsg.toFixed(2) : '—'}</td><td>${fmtInt(T.leads)}</td></tr>`;
   html += '</tbody></table>';
   document.getElementById('meta-table').innerHTML = html;
+
+  if (document.getElementById('meta-camp-wrap').style.display !== 'none') renderMetaCampaigns();
 }
 
 function setTheme(mode) {
