@@ -83,6 +83,23 @@ def get_bucket(code):
     return {"WON": "cerrado", "LOSE": "negado", "APOLOGY": "descartado"}.get(code, "asignado")
 
 
+SOURCE_NAME_MAP = {
+    "": "Sin registrar",
+    "13|ANK_CHATS_APP24_CA_WHATS_APP": "WhatsApp",
+    "WEB": "Sitio web",
+    "CALL": "Llamada",
+    "WEBFORM": "Formulario web",
+    "EMAIL": "Email",
+    "OTHER": "Otro",
+}
+
+
+def get_source_name(src):
+    if not src:
+        return "Sin registrar"
+    return SOURCE_NAME_MAP.get(src, src)
+
+
 def fetch_all_deals():
     count_body = {"filter": {">=DATE_CREATE": YEAR_START, "<DATE_CREATE": YEAR_END}, "select": ["ID"]}
     total = bitrix_call("crm.deal.list", count_body, "POST")["total"]
@@ -91,7 +108,7 @@ def fetch_all_deals():
     page_size = 50
     num_pages = (total + page_size - 1) // page_size
     all_deals = []
-    select_fields = ["ID", "ASSIGNED_BY_ID", "STAGE_ID", "CATEGORY_ID", "DATE_CREATE", "OPPORTUNITY", "CLOSEDATE"]
+    select_fields = ["ID", "ASSIGNED_BY_ID", "STAGE_ID", "CATEGORY_ID", "DATE_CREATE", "OPPORTUNITY", "CLOSEDATE", "SOURCE_ID"]
 
     def build_cmd(start):
         params = [("order[ID]", "ASC"), ("filter[>=DATE_CREATE]", YEAR_START), ("filter[<DATE_CREATE]", YEAR_END)]
@@ -202,6 +219,34 @@ def fetch_stage_times(all_deals, user_map):
     return resp_rows, stage_rows
 
 
+def fetch_meta_breakdown(breakdowns, field_map):
+    """Insights a nivel CUENTA (no campania) con un breakdown de Meta, por mes.
+    Se usa para demografia (age,gender) y placement (publisher_platform,platform_position).
+    field_map: {nombre_breakdown_de_meta: nombre_de_salida}."""
+    rows = []
+    for name, act in META_ACCOUNTS.items():
+        q = urllib.parse.urlencode({
+            "access_token": META_TOKEN, "level": "account",
+            "time_range": '{"since":"2026-01-01","until":"2027-01-01"}',
+            "time_increment": "monthly", "breakdowns": breakdowns,
+            "fields": "spend,impressions,clicks,date_start", "limit": "500",
+        })
+        try:
+            with urllib.request.urlopen(f"https://graph.facebook.com/v23.0/{act}/insights?{q}", timeout=60) as r:
+                data = json.loads(r.read().decode("utf-8")).get("data", [])
+        except Exception as e:  # noqa: BLE001
+            print(f"   {name} ({breakdowns}): ERROR {e}")
+            continue
+        for rec in data:
+            row = {"account_id": act, "account_name": name, "month": rec["date_start"][:7],
+                   "spend": round(float(rec.get("spend", 0)), 2),
+                   "impressions": int(float(rec.get("impressions", 0))), "clicks": int(float(rec.get("clicks", 0)))}
+            for src, out in field_map.items():
+                row[out] = rec.get(src)
+            rows.append(row)
+    return rows
+
+
 def fetch_all_users():
     all_users = []
     start = 0
@@ -300,6 +345,7 @@ def main():
         user_map[str(u["ID"])] = name if name else f"Usuario {u['ID']}"
 
     agg = {}
+    source_agg = {}
     for d in deals:
         adv_id = str(d.get("ASSIGNED_BY_ID"))
         adv_name = user_map.get(adv_id, f"Usuario {adv_id}")
@@ -324,11 +370,24 @@ def main():
         agg[key]["count"] += 1
         agg[key]["opportunity_sum"] += opp
 
+        src_name = get_source_name(d.get("SOURCE_ID"))
+        src_key = (adv_id, cat_id, month, src_name)
+        if src_key not in source_agg:
+            source_agg[src_key] = {
+                "advisor_id": adv_id, "advisor_name": adv_name,
+                "category_id": cat_id, "category_name": cat_name,
+                "month": month, "source_name": src_name, "count": 0,
+            }
+        source_agg[src_key]["count"] += 1
+
     result = sorted(agg.values(), key=lambda r: (r["advisor_name"], r["category_name"], r["month"], r["bucket"]))
     print(f"   {len(result)} filas agregadas")
+    source_result = sorted(source_agg.values(), key=lambda r: (r["advisor_name"], r["category_name"], r["month"], r["source_name"]))
 
     with open(os.path.join(ROOT, "data", "aggregated.json"), "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(ROOT, "data", "lead_sources.json"), "w", encoding="utf-8") as f:
+        json.dump(source_result, f, ensure_ascii=False, indent=2)
 
     print("Descargando historial de etapas (tiempos de respuesta/gestion)...")
     resp_path = os.path.join(ROOT, "data", "response_time.json")
@@ -360,6 +419,27 @@ def main():
             f.write("[]")
     meta_compact = open(meta_path, encoding="utf-8").read().strip() or "[]"
 
+    print("Descargando demografia (edad/genero) y placement de Meta...")
+    demo_path = os.path.join(ROOT, "data", "meta_demographics.json")
+    place_path = os.path.join(ROOT, "data", "meta_placement.json")
+    try:
+        demo_rows = fetch_meta_breakdown("age,gender", {"age": "age", "gender": "gender"}) if META_TOKEN else []
+        place_rows = fetch_meta_breakdown("publisher_platform,platform_position", {"publisher_platform": "platform", "platform_position": "position"}) if META_TOKEN else []
+        with open(demo_path, "w", encoding="utf-8") as f:
+            json.dump(demo_rows, f, ensure_ascii=False, indent=1)
+        with open(place_path, "w", encoding="utf-8") as f:
+            json.dump(place_rows, f, ensure_ascii=False, indent=1)
+        print(f"   {len(demo_rows)} filas de demografia, {len(place_rows)} filas de placement")
+    except Exception as e:  # noqa: BLE001
+        print(f"   Demografia/placement de Meta fallaron ({e}). Se usan los JSON anteriores.")
+        if not os.path.exists(demo_path):
+            open(demo_path, "w", encoding="utf-8").write("[]")
+        if not os.path.exists(place_path):
+            open(place_path, "w", encoding="utf-8").write("[]")
+    demo_compact = json.dumps(json.loads(open(demo_path, encoding="utf-8").read() or "[]"), ensure_ascii=False, separators=(",", ":"))
+    place_compact = json.dumps(json.loads(open(place_path, encoding="utf-8").read() or "[]"), ensure_ascii=False, separators=(",", ":"))
+    source_compact = json.dumps(source_result, ensure_ascii=False, separators=(",", ":"))
+
     print("4/4 Regenerando dashboard.html...")
     with open(os.path.join(ROOT, "dashboard_template.html"), "r", encoding="utf-8") as f:
         template = f.read()
@@ -372,6 +452,9 @@ def main():
                       .replace("/*__META_DATA__*/", meta_compact)
                       .replace("/*__RESPONSE_TIME_DATA__*/", resp_compact)
                       .replace("/*__STAGE_TIME_DATA__*/", stage_compact)
+                      .replace("/*__LEAD_SOURCES_DATA__*/", source_compact)
+                      .replace("/*__META_DEMO_DATA__*/", demo_compact)
+                      .replace("/*__META_PLACEMENT_DATA__*/", place_compact)
                       .replace("/*__LOGO_B64__*/", logo_b64)
                       .replace("/*__GENERATED_AT__*/", formatted_now_ecuador()))
     with open(os.path.join(ROOT, "dashboard.html"), "w", encoding="utf-8") as f:

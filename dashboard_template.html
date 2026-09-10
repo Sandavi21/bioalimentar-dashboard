@@ -431,6 +431,14 @@
     <div id="chart-pipeline"></div>
   </div>
 
+  <div id="source-section" style="margin-top:16px;display:none;">
+    <div class="card">
+      <div class="section-title">Origen de los leads</div>
+      <div class="section-sub" id="source-sub">Canal registrado en Bitrix24 — cambia con Pipeline, Asesor y Mes</div>
+      <div id="chart-source"></div>
+    </div>
+  </div>
+
   <div class="card" style="margin-top:16px;">
     <div class="section-title">Embudo</div>
     <div class="section-sub">Todos los leads → Asignados (pipeline LEADS) → Cerrados (suma de BIO BALANCEADOS + MASCOTAS + BIOEQUINOS) — fijo a todos los asesores, solo cambia con Mes</div>
@@ -540,6 +548,22 @@
       <div id="meta-table"></div>
     </div>
 
+    <div id="meta-demo-section" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-title">Audiencia por edad y género</div>
+          <div class="section-sub">Solo respeta Cuenta + Mes (no el segmento B2B/B2C — es a nivel cuenta, no por campaña)</div>
+          <div id="chart-meta-demo"></div>
+          <div class="legend" id="legend-meta-demo"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Dónde se mostraron los anuncios</div>
+          <div class="section-sub">Plataforma y ubicación (placement) — mismo alcance que el gráfico de al lado</div>
+          <div id="meta-place-table" style="overflow-x:auto;"></div>
+        </div>
+      </div>
+    </div>
+
     <button class="table-toggle" id="meta-camp-toggle" onclick="toggleMetaCamp()">Ver campañas (una fila por campaña) ▾</button>
     <div id="meta-camp-wrap" style="display:none;">
       <input id="meta-camp-search" type="text" placeholder="Buscar campaña…" oninput="renderMetaCampaigns()"
@@ -578,6 +602,9 @@ const DATA = /*__LEADS_DATA__*/;
 const META = /*__META_DATA__*/;
 const RESPONSE_TIME = /*__RESPONSE_TIME_DATA__*/;
 const STAGE_TIME = /*__STAGE_TIME_DATA__*/;
+const LEAD_SOURCES = /*__LEAD_SOURCES_DATA__*/;
+const META_DEMO = /*__META_DEMO_DATA__*/;
+const META_PLACEMENT = /*__META_PLACEMENT_DATA__*/;
 const GENERATED_AT = "/*__GENERATED_AT__*/";
 
 const BUCKET_COLOR = { asignado: 'var(--series-asignado)', negado: 'var(--series-negado)', cerrado: 'var(--series-cerrado)', descartado: 'var(--series-descartado)' };
@@ -1058,7 +1085,52 @@ function refresh() {
   renderTable(rows);
   renderPipelineFunnel(fixedRows);
   renderRt();
+  renderSource();
   renderMeta();
+}
+
+// ================= Origen de los leads (Bitrix SOURCE_ID) =================
+function renderSource() {
+  const section = document.getElementById('source-section');
+  if (!Array.isArray(LEAD_SOURCES) || !LEAD_SOURCES.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const rows = LEAD_SOURCES.filter(d => state.pipelines.has(d.category_name) && state.advisors.has(d.advisor_name) && state.months.has(d.month));
+  const cont = document.getElementById('chart-source');
+  cont.innerHTML = '';
+  const byName = {};
+  let total = 0, sinRegistrar = 0;
+  rows.forEach(r => {
+    byName[r.source_name] = (byName[r.source_name] || 0) + r.count;
+    total += r.count;
+    if (r.source_name === 'Sin registrar') sinRegistrar += r.count;
+  });
+  const pctSin = total ? (sinRegistrar / total * 100) : 0;
+  document.getElementById('source-sub').textContent =
+    'Canal registrado en Bitrix24 — cambia con Pipeline, Asesor y Mes · ' + fmtPct(pctSin) + ' de los leads no tiene canal registrado';
+
+  const list = Object.entries(byName).filter(([n, v]) => v > 0 && n !== 'Sin registrar').sort((a, b) => b[1] - a[1]);
+  if (!list.length) { cont.innerHTML = '<div class="empty-state">Sin canal registrado para este período/filtro.</div>'; return; }
+  const max = Math.max(...list.map(l => l[1]));
+  const barAreaW = (cont.clientWidth || 900) - 210;
+  list.forEach(([name, val]) => {
+    const row = document.createElement('div'); row.className = 'bar-row';
+    const nm = document.createElement('div'); nm.className = 'name'; nm.textContent = name; nm.title = name;
+    row.appendChild(nm);
+    const track = document.createElement('div'); track.className = 'track';
+    const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+    const w = Math.max((val / max) * (barAreaW - 60), 2);
+    const rect = svgEl('rect', { x: 0, y: 1, width: Math.max(w - 2, 0), height: 20, rx: 4, fill: 'var(--series-total)' });
+    rect.addEventListener('mousemove', (e) => showTip(e, name, [['Leads', fmtInt(val)], ['% del total', fmtPct(val / total * 100)]]));
+    rect.addEventListener('mouseleave', hideTip);
+    svg.appendChild(rect);
+    const lbl = svgEl('text', { x: w + 6, y: 15, class: 'axis-label', fill: 'var(--text-secondary)' });
+    lbl.textContent = fmtInt(val);
+    svg.appendChild(lbl);
+    track.appendChild(svg);
+    row.appendChild(track);
+    cont.appendChild(row);
+  });
 }
 
 // ================= Tiempos de gestion (primera respuesta + tiempo por etapa) =================
@@ -1303,7 +1375,89 @@ function renderMeta() {
   html += '</tbody></table>';
   document.getElementById('meta-table').innerHTML = html;
 
+  renderMetaDemo();
+  renderMetaPlacement();
   if (document.getElementById('meta-camp-wrap').style.display !== 'none') renderMetaCampaigns();
+}
+
+// Demografia (edad/genero) y placement: a nivel CUENTA (no por campana), asi que solo
+// respetan Cuenta + Mes -- no el toggle de segmento B2B/B2C.
+const AGE_ORDER = ['13-17', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
+const GENDER_LABEL = { male: 'Hombres', female: 'Mujeres', unknown: 'No especificado' };
+const GENDER_COLOR = { male: 'var(--series-cerrado)', female: 'var(--brand-red)', unknown: 'var(--series-asignado)' };
+
+function getMetaDemoRows() { return META_DEMO.filter(d => state.months.has(d.month) && state.metaAccounts.has(d.account_name)); }
+function getMetaPlaceRows() { return META_PLACEMENT.filter(d => state.months.has(d.month) && state.metaAccounts.has(d.account_name)); }
+
+function renderMetaDemo() {
+  const section = document.getElementById('meta-demo-section');
+  if (!Array.isArray(META_DEMO) || !META_DEMO.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const rows = getMetaDemoRows();
+  const cont = document.getElementById('chart-meta-demo');
+  cont.innerHTML = '';
+  const byAge = {};
+  rows.forEach(r => {
+    const age = r.age || 'Unknown';
+    if (!byAge[age]) byAge[age] = { male: 0, female: 0, unknown: 0, total: 0 };
+    const g = (r.gender && GENDER_LABEL[r.gender]) ? r.gender : 'unknown';
+    byAge[age][g] += r.spend;
+    byAge[age].total += r.spend;
+  });
+  const ages = Object.keys(byAge).filter(a => byAge[a].total > 0).sort((a, b) => {
+    const ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+  if (!ages.length) { cont.innerHTML = '<div class="empty-state">Sin datos de audiencia para este período/filtro.</div>'; }
+  else {
+    const max = Math.max(...ages.map(a => byAge[a].total));
+    const barAreaW = (cont.clientWidth || 420) - 90;
+    ages.forEach(age => {
+      const v = byAge[age];
+      const row = document.createElement('div'); row.className = 'bar-row';
+      const nm = document.createElement('div'); nm.className = 'name'; nm.style.width = '54px'; nm.textContent = age;
+      row.appendChild(nm);
+      const track = document.createElement('div'); track.className = 'track';
+      const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+      let x = 0;
+      ['female', 'male', 'unknown'].forEach(g => {
+        const val = v[g];
+        if (!val) return;
+        const w = (val / max) * (barAreaW - 4);
+        const rect = svgEl('rect', { x, y: 1, width: Math.max(w - 1, 0), height: 20, rx: 3, fill: GENDER_COLOR[g] });
+        rect.addEventListener('mousemove', (e) => showTip(e, age, [[GENDER_LABEL[g], fmtUSD(val)], ['Total', fmtUSD(v.total)]]));
+        rect.addEventListener('mouseleave', hideTip);
+        svg.appendChild(rect);
+        x += w;
+      });
+      track.appendChild(svg);
+      row.appendChild(track);
+      cont.appendChild(row);
+    });
+  }
+  document.getElementById('legend-meta-demo').innerHTML = ['female', 'male', 'unknown']
+    .map(g => `<span class="item"><span class="sw" style="background:${GENDER_COLOR[g]}"></span>${GENDER_LABEL[g]}</span>`).join('');
+}
+
+function renderMetaPlacement() {
+  const rows = getMetaPlaceRows();
+  const cont = document.getElementById('meta-place-table');
+  if (!cont) return;
+  const byPlace = {};
+  rows.forEach(r => {
+    const key = (r.platform || '—') + ' · ' + (r.position || '—');
+    if (!byPlace[key]) byPlace[key] = { spend: 0, impressions: 0, clicks: 0 };
+    byPlace[key].spend += r.spend; byPlace[key].impressions += r.impressions; byPlace[key].clicks += r.clicks;
+  });
+  const list = Object.entries(byPlace).filter(([, v]) => v.spend > 0).sort((a, b) => b[1].spend - a[1].spend).slice(0, 15);
+  if (!list.length) { cont.innerHTML = '<div class="empty-state">Sin datos de ubicación para este período/filtro.</div>'; return; }
+  let html = '<table class="datatable"><thead><tr><th>Plataforma · ubicación</th><th>Gasto</th><th>Impresiones</th><th>Clics</th></tr></thead><tbody>';
+  list.forEach(([name, v]) => {
+    html += `<tr><td>${name}</td><td>${fmtUSD(v.spend)}</td><td>${fmtInt(v.impressions)}</td><td>${fmtInt(v.clicks)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  cont.innerHTML = html;
 }
 
 function setTheme(mode) {

@@ -5,4 +5,7 @@ data/users.json
 data/meta_aggregated.json
 data/response_time.json
 data/stage_time.json
+data/lead_sources.json
+data/meta_demographics.json
+data/meta_placement.json
 __pycache__/
