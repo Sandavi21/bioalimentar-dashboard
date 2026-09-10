@@ -116,6 +116,92 @@ def fetch_all_deals():
     return all_deals
 
 
+def fetch_stage_times(all_deals, user_map):
+    """crm.stagehistory.list -> tiempo de primera respuesta + tiempo por etapa,
+    agregado por asesor + pipeline + (+ etapa) + mes. Ver refresh.ps1 para el detalle
+    del calculo; misma logica, en Python."""
+    deal_meta = {str(d["ID"]): {"adv": str(d.get("ASSIGNED_BY_ID")), "cat": str(d.get("CATEGORY_ID"))} for d in all_deals}
+
+    count_body = {"entityTypeId": 2, "filter": {">=CREATED_TIME": YEAR_START}, "select": ["ID"]}
+    total = bitrix_call("crm.stagehistory.list", count_body, "POST")["total"]
+    print(f"   Total registros de historial: {total}")
+
+    page_size = 50
+    num_pages = (total + page_size - 1) // page_size
+    all_hist = []
+
+    def build_cmd(start):
+        params = [("entityTypeId", "2"), ("filter[>=CREATED_TIME]", YEAR_START), ("order[ID]", "ASC"),
+                  ("select[]", "OWNER_ID"), ("select[]", "STAGE_ID"), ("select[]", "CREATED_TIME"),
+                  ("start", str(start))]
+        qs = urllib.parse.urlencode(params)
+        return f"crm.stagehistory.list?{qs}"
+
+    page_index = 0
+    while page_index < num_pages:
+        cmd = {}
+        for _ in range(50):
+            if page_index >= num_pages:
+                break
+            cmd[f"c{page_index}"] = build_cmd(page_index * page_size)
+            page_index += 1
+        resp = bitrix_call("batch", {"halt": 0, "cmd": cmd}, "POST")
+        result = resp["result"]["result"]
+        for key in result:
+            all_hist.extend(result[key].get("items", []))
+        print(f"   {page_index} / {num_pages} paginas historial, {len(all_hist)} filas")
+
+    by_deal = {}
+    for e in all_hist:
+        by_deal.setdefault(str(e["OWNER_ID"]), []).append(e)
+
+    resp_agg, stage_agg = {}, {}
+    for deal_id, entries in by_deal.items():
+        meta = deal_meta.get(deal_id)
+        if not meta or len(entries) < 2:
+            continue
+        entries.sort(key=lambda e: datetime.fromisoformat(e["CREATED_TIME"]))
+        times = [datetime.fromisoformat(e["CREATED_TIME"]) for e in entries]
+
+        resp_hours = (times[1] - times[0]).total_seconds() / 3600
+        if resp_hours >= 0:
+            r_key = (meta["adv"], meta["cat"], entries[0]["CREATED_TIME"][:7])
+            d = resp_agg.setdefault(r_key, {"count": 0, "sum_hours": 0.0})
+            d["count"] += 1
+            d["sum_hours"] += resp_hours
+
+        for i in range(len(entries) - 1):
+            hrs = (times[i + 1] - times[i]).total_seconds() / 3600
+            if hrs < 0:
+                continue
+            code = re.sub(r"^C\d+:", "", entries[i]["STAGE_ID"])
+            s_key = (meta["adv"], meta["cat"], code, entries[i]["CREATED_TIME"][:7])
+            d = stage_agg.setdefault(s_key, {"count": 0, "sum_hours": 0.0})
+            d["count"] += 1
+            d["sum_hours"] += hrs
+
+    resp_rows = []
+    for (adv, cat, month), v in resp_agg.items():
+        resp_rows.append({
+            "advisor_id": adv, "advisor_name": user_map.get(adv, f"Usuario {adv}"),
+            "category_id": cat, "category_name": CATEGORY_MAP.get(cat, f"Pipeline {cat}"),
+            "month": month, "count": v["count"], "sum_hours": round(v["sum_hours"], 2),
+        })
+    resp_rows.sort(key=lambda r: (r["advisor_name"], r["category_name"], r["month"]))
+
+    stage_rows = []
+    for (adv, cat, code, month), v in stage_agg.items():
+        stage_rows.append({
+            "advisor_id": adv, "advisor_name": user_map.get(adv, f"Usuario {adv}"),
+            "category_id": cat, "category_name": CATEGORY_MAP.get(cat, f"Pipeline {cat}"),
+            "stage_code": code, "stage_name": STAGE_NAMES.get(cat, {}).get(code, code),
+            "month": month, "count": v["count"], "sum_hours": round(v["sum_hours"], 2),
+        })
+    stage_rows.sort(key=lambda r: (r["advisor_name"], r["category_name"], r["stage_name"], r["month"]))
+    print(f"   {len(resp_rows)} filas de primera-respuesta, {len(stage_rows)} filas de tiempo-por-etapa")
+    return resp_rows, stage_rows
+
+
 def fetch_all_users():
     all_users = []
     start = 0
@@ -244,6 +330,24 @@ def main():
     with open(os.path.join(ROOT, "data", "aggregated.json"), "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
+    print("Descargando historial de etapas (tiempos de respuesta/gestion)...")
+    resp_path = os.path.join(ROOT, "data", "response_time.json")
+    stage_path = os.path.join(ROOT, "data", "stage_time.json")
+    try:
+        resp_rows, stage_rows = fetch_stage_times(deals, user_map)
+        with open(resp_path, "w", encoding="utf-8") as f:
+            json.dump(resp_rows, f, ensure_ascii=False, indent=1)
+        with open(stage_path, "w", encoding="utf-8") as f:
+            json.dump(stage_rows, f, ensure_ascii=False, indent=1)
+    except Exception as e:  # noqa: BLE001
+        print(f"   Tiempos de gestion fallaron ({e}). Se usan los JSON anteriores.")
+        if not os.path.exists(resp_path):
+            open(resp_path, "w", encoding="utf-8").write("[]")
+        if not os.path.exists(stage_path):
+            open(stage_path, "w", encoding="utf-8").write("[]")
+    resp_compact = json.dumps(json.loads(open(resp_path, encoding="utf-8").read() or "[]"), ensure_ascii=False, separators=(",", ":"))
+    stage_compact = json.dumps(json.loads(open(stage_path, encoding="utf-8").read() or "[]"), ensure_ascii=False, separators=(",", ":"))
+
     print("Descargando Meta Ads insights...")
     meta_path = os.path.join(ROOT, "data", "meta_aggregated.json")
     meta_rows = fetch_meta_rows()
@@ -266,6 +370,8 @@ def main():
     meta_compact = json.dumps(json.loads(meta_compact), ensure_ascii=False, separators=(",", ":"))
     final = (template.replace("/*__LEADS_DATA__*/", compact)
                       .replace("/*__META_DATA__*/", meta_compact)
+                      .replace("/*__RESPONSE_TIME_DATA__*/", resp_compact)
+                      .replace("/*__STAGE_TIME_DATA__*/", stage_compact)
                       .replace("/*__LOGO_B64__*/", logo_b64)
                       .replace("/*__GENERATED_AT__*/", formatted_now_ecuador()))
     with open(os.path.join(ROOT, "dashboard.html"), "w", encoding="utf-8") as f:

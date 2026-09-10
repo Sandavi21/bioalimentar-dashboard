@@ -3,4 +3,6 @@ data/aggregated.json
 data/deals_2026_raw.json
 data/users.json
 data/meta_aggregated.json
+data/response_time.json
+data/stage_time.json
 __pycache__/

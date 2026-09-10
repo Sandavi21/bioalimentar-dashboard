@@ -437,6 +437,44 @@
     <div id="funnel-pipelines" class="funnel"></div>
   </div>
 
+  <div id="rt-section" style="margin-top:16px;display:none;">
+    <div class="card">
+      <div class="section-title">Tiempos de gestión</div>
+      <div class="section-sub">Del historial de cambios de etapa de Bitrix24 (promedios) — cambia con Pipeline, Asesor y Mes</div>
+      <div class="kpi-grid kpi-grid-3">
+        <div class="kpi" style="--accent:var(--brand-red)">
+          <div class="label">Primera respuesta (promedio)</div>
+          <div class="value" id="rt-avg">—</div>
+          <div class="sub" id="rt-n">—</div>
+        </div>
+        <div class="kpi" style="--accent:var(--series-descartado)">
+          <div class="label">Etapa más lenta en promedio</div>
+          <div class="value" id="rt-slowest" style="font-size:18px;">—</div>
+          <div class="sub" id="rt-slowest-sub">—</div>
+        </div>
+        <div class="kpi" style="--accent:var(--series-asignado)">
+          <div class="label">Tramos analizados</div>
+          <div class="value" id="rt-total-n">—</div>
+          <div class="sub">cambios de etapa con duración calculada</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:18px;">Primera respuesta por asesor</div>
+      <div class="section-sub">Horas desde que el lead entra hasta el primer cambio de etapa — menor es mejor</div>
+      <div id="chart-rt-advisor"></div>
+
+      <div class="section-title" style="margin-top:18px;">Tiempo promedio por etapa</div>
+      <div class="section-sub" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span>Cuánto tardan en avanzar las negociaciones en cada paso, en promedio</span>
+        <div class="view-toggle" id="rt-toggle">
+          <button data-view="stage" class="active" onclick="setRtView('stage')">Por etapa</button>
+          <button data-view="advisor" onclick="setRtView('advisor')">Por asesor</button>
+        </div>
+      </div>
+      <div id="rt-stage-table"></div>
+    </div>
+  </div>
+
   <button class="table-toggle" id="table-toggle" onclick="toggleTable()">Ver tabla de datos ▾</button>
   <div id="table-wrap" style="display:none;"></div>
 
@@ -538,6 +576,8 @@
 <script>
 const DATA = /*__LEADS_DATA__*/;
 const META = /*__META_DATA__*/;
+const RESPONSE_TIME = /*__RESPONSE_TIME_DATA__*/;
+const STAGE_TIME = /*__STAGE_TIME_DATA__*/;
 const GENERATED_AT = "/*__GENERATED_AT__*/";
 
 const BUCKET_COLOR = { asignado: 'var(--series-asignado)', negado: 'var(--series-negado)', cerrado: 'var(--series-cerrado)', descartado: 'var(--series-descartado)' };
@@ -1017,7 +1057,120 @@ function refresh() {
   renderPipelineChart(rows);
   renderTable(rows);
   renderPipelineFunnel(fixedRows);
+  renderRt();
   renderMeta();
+}
+
+// ================= Tiempos de gestion (primera respuesta + tiempo por etapa) =================
+// Salen de crm.stagehistory.list de Bitrix (ver refresh.ps1/refresh.py). Se filtran igual
+// que el resto de Bitrix: Pipeline (category_name) + Asesor (advisor_name) + Mes.
+let rtView = 'stage';
+const RT_MIN_N = 3; // no promediar con menos de 3 casos (poco representativo)
+
+function setRtView(v) {
+  rtView = v;
+  document.querySelectorAll('#rt-toggle button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  renderRt();
+}
+
+function fmtHours(h) {
+  if (!isFinite(h) || h <= 0) return '—';
+  if (h < 1) return Math.round(h * 60) + ' min';
+  if (h < 48) return h.toFixed(1) + ' h';
+  return (h / 24).toFixed(1) + ' días';
+}
+
+function getRtFiltered(arr) {
+  return arr.filter(d => state.pipelines.has(d.category_name) && state.advisors.has(d.advisor_name) && state.months.has(d.month));
+}
+
+function renderRt() {
+  const section = document.getElementById('rt-section');
+  const hasData = (Array.isArray(RESPONSE_TIME) && RESPONSE_TIME.length) || (Array.isArray(STAGE_TIME) && STAGE_TIME.length);
+  if (!hasData) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const respRows = getRtFiltered(RESPONSE_TIME);
+  const stageRows = getRtFiltered(STAGE_TIME);
+
+  let rCount = 0, rSum = 0;
+  respRows.forEach(r => { rCount += r.count; rSum += r.sum_hours; });
+  document.getElementById('rt-avg').textContent = rCount >= RT_MIN_N ? fmtHours(rSum / rCount) : '—';
+  document.getElementById('rt-n').textContent = rCount ? fmtInt(rCount) + ' leads con dato' : 'sin datos para el período';
+
+  const byStage = {};
+  stageRows.forEach(r => {
+    if (!byStage[r.stage_name]) byStage[r.stage_name] = { count: 0, sum_hours: 0 };
+    byStage[r.stage_name].count += r.count; byStage[r.stage_name].sum_hours += r.sum_hours;
+  });
+  const stageList = Object.entries(byStage).map(([name, v]) => [name, v.sum_hours / v.count, v.count]).filter(x => x[2] >= RT_MIN_N);
+  stageList.sort((a, b) => b[1] - a[1]);
+  let sTotal = 0; stageRows.forEach(r => sTotal += r.count);
+  document.getElementById('rt-total-n').textContent = fmtInt(sTotal);
+  if (stageList.length) {
+    document.getElementById('rt-slowest').textContent = stageList[0][0];
+    document.getElementById('rt-slowest-sub').textContent = fmtHours(stageList[0][1]) + ' en promedio (' + fmtInt(stageList[0][2]) + ' casos)';
+  } else {
+    document.getElementById('rt-slowest').textContent = '—';
+    document.getElementById('rt-slowest-sub').textContent = 'sin suficientes datos';
+  }
+
+  // --- barras: primera respuesta por asesor (mas rapido primero) ---
+  const cont = document.getElementById('chart-rt-advisor');
+  cont.innerHTML = '';
+  const byAdv = {};
+  respRows.forEach(r => {
+    if (!byAdv[r.advisor_name]) byAdv[r.advisor_name] = { count: 0, sum_hours: 0 };
+    byAdv[r.advisor_name].count += r.count; byAdv[r.advisor_name].sum_hours += r.sum_hours;
+  });
+  const advList = Object.entries(byAdv).filter(([, v]) => v.count >= RT_MIN_N).map(([name, v]) => [name, v.sum_hours / v.count, v.count]);
+  advList.sort((a, b) => a[1] - b[1]);
+  if (!advList.length) {
+    cont.innerHTML = '<div class="empty-state">Sin suficientes datos para el período/filtro (mínimo ' + RT_MIN_N + ' leads por asesor).</div>';
+  } else {
+    const max = Math.max(...advList.map(l => l[1]));
+    const barAreaW = (cont.clientWidth || 900) - 210;
+    advList.forEach(([name, hrs, n]) => {
+      const row = document.createElement('div'); row.className = 'bar-row';
+      const nm = document.createElement('div'); nm.className = 'name'; nm.textContent = name; nm.title = name;
+      row.appendChild(nm);
+      const track = document.createElement('div'); track.className = 'track';
+      const svg = svgEl('svg', { width: '100%', height: 22, viewBox: `0 0 ${barAreaW} 22`, preserveAspectRatio: 'none' });
+      const w = Math.max((hrs / max) * (barAreaW - 70), 2);
+      const rect = svgEl('rect', { x: 0, y: 1, width: w, height: 20, rx: 4, fill: 'var(--series-total)' });
+      rect.addEventListener('mousemove', (e) => showTip(e, name, [['Primera respuesta', fmtHours(hrs)], ['Leads', fmtInt(n)]]));
+      rect.addEventListener('mouseleave', hideTip);
+      svg.appendChild(rect);
+      const lbl = svgEl('text', { x: w + 6, y: 15, class: 'axis-label', fill: 'var(--text-secondary)' });
+      lbl.textContent = fmtHours(hrs);
+      svg.appendChild(lbl);
+      track.appendChild(svg);
+      row.appendChild(track);
+      cont.appendChild(row);
+    });
+  }
+
+  // --- tabla: por etapa o por asesor ---
+  let html;
+  if (rtView === 'stage') {
+    html = '<table class="datatable"><thead><tr><th>Etapa</th><th>Tiempo promedio</th><th>Tramos</th></tr></thead><tbody>';
+    stageList.forEach(([name, hrs, n]) => { html += `<tr><td>${name}</td><td>${fmtHours(hrs)}</td><td>${fmtInt(n)}</td></tr>`; });
+    html += '</tbody></table>';
+    if (!stageList.length) html = '<div class="empty-state">Sin suficientes datos (mínimo ' + RT_MIN_N + ' tramos por etapa).</div>';
+  } else {
+    const byA = {};
+    stageRows.forEach(r => {
+      if (!byA[r.advisor_name]) byA[r.advisor_name] = { count: 0, sum_hours: 0 };
+      byA[r.advisor_name].count += r.count; byA[r.advisor_name].sum_hours += r.sum_hours;
+    });
+    const list = Object.entries(byA).filter(([, v]) => v.count >= RT_MIN_N).map(([name, v]) => [name, v.sum_hours / v.count, v.count]);
+    list.sort((a, b) => a[1] - b[1]);
+    html = '<table class="datatable"><thead><tr><th>Asesor</th><th>Tiempo promedio por etapa</th><th>Tramos</th></tr></thead><tbody>';
+    list.forEach(([name, hrs, n]) => { html += `<tr><td>${name}</td><td>${fmtHours(hrs)}</td><td>${fmtInt(n)}</td></tr>`; });
+    html += '</tbody></table>';
+    if (!list.length) html = '<div class="empty-state">Sin suficientes datos (mínimo ' + RT_MIN_N + ' tramos por asesor).</div>';
+  }
+  document.getElementById('rt-stage-table').innerHTML = html;
 }
 
 // ================= Meta Ads =================
@@ -1328,6 +1481,34 @@ function buildPdfDoc() {
         ['Cerrados (BIO BALANCEADOS + MASCOTAS + BIOEQUINOS)', fmtInt(fn.cerrados) + '  (' + pct(fn.cerrados, fn.total) + ')'],
       ],
     });
+
+    // --- Tiempos de gestion ---
+    if ((Array.isArray(RESPONSE_TIME) && RESPONSE_TIME.length) || (Array.isArray(STAGE_TIME) && STAGE_TIME.length)) {
+      const rtResp = getRtFiltered(RESPONSE_TIME);
+      const rtStage = getRtFiltered(STAGE_TIME);
+      const byAdvResp = {};
+      rtResp.forEach(r => { const a = byAdvResp[r.advisor_name] || (byAdvResp[r.advisor_name] = { count: 0, sum_hours: 0 }); a.count += r.count; a.sum_hours += r.sum_hours; });
+      const respList = Object.entries(byAdvResp).filter(([, v]) => v.count >= RT_MIN_N).map(([n, v]) => [n, v.sum_hours / v.count, v.count]).sort((a, b) => a[1] - b[1]);
+      const byStg = {};
+      rtStage.forEach(r => { const a = byStg[r.stage_name] || (byStg[r.stage_name] = { count: 0, sum_hours: 0 }); a.count += r.count; a.sum_hours += r.sum_hours; });
+      const stgList = Object.entries(byStg).filter(([, v]) => v.count >= RT_MIN_N).map(([n, v]) => [n, v.sum_hours / v.count, v.count]).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      if (respList.length) {
+        doc.autoTable({
+          ...tblOpts, startY: doc.lastAutoTable.finalY + 7,
+          head: [['Primera respuesta por asesor', 'Promedio', 'Leads']],
+          columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
+          body: respList.map(([n, h, c]) => [n, fmtHours(h), fmtInt(c)]),
+        });
+      }
+      if (stgList.length) {
+        doc.autoTable({
+          ...tblOpts, startY: doc.lastAutoTable.finalY + 5,
+          head: [['Etapa mas lenta en promedio', 'Promedio', 'Tramos']],
+          columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
+          body: stgList.map(([n, h, c]) => [n, fmtHours(h), fmtInt(c)]),
+        });
+      }
+    }
 
     // --- Meta Ads ---
     if (Array.isArray(META) && META.length) {
