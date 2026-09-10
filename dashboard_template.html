@@ -562,6 +562,11 @@ const LINE_STYLES = [
 function uniq(arr) { return [...new Set(arr)]; }
 const ALL_MONTHS = uniq(DATA.map(d => d.month)).sort();
 const META_ACCOUNTS_LIST = (Array.isArray(META) ? uniq(META.map(d => d.account_name)) : []).sort();
+// El filtro de Asesor lista a TODOS los que tienen leads en Bitrix (incluye al bot
+// "Bioalimentar Digital"), para poder tildar "Todos" y que "Según filtros" sume igual
+// que "Panorama general". El DEFAULT que se ve al abrir el dashboard sigue siendo
+// solo Jessica + Juan Pablo (pedido explícito del usuario) — esto solo agrega la opción.
+const ALL_ADVISORS = uniq(DATA.map(d => d.advisor_name)).sort();
 
 // Por defecto solo los 4 pipelines de venta real y los 2 asesores humanos activos
 // (pedido explícito del usuario); se pueden marcar los demás a mano en los filtros.
@@ -599,7 +604,7 @@ function buildCombo(panelId, lblId, items, stateKey) {
   });
 }
 buildCombo('panel-pipeline','lbl-pipeline', PANORAMA_PIPELINES, 'pipelines');
-buildCombo('panel-advisor','lbl-advisor', DEFAULT_ADVISORS, 'advisors');
+buildCombo('panel-advisor','lbl-advisor', ALL_ADVISORS, 'advisors');
 buildCombo('panel-month','lbl-month', ALL_MONTHS, 'months');
 if (META_ACCOUNTS_LIST.length) buildCombo('panel-meta-acc','lbl-meta-acc', META_ACCOUNTS_LIST, 'metaAccounts');
 
@@ -970,7 +975,7 @@ function toggleTable() {
 function refresh() {
   const rows = getFiltered();
   document.getElementById('lbl-pipeline').textContent = state.pipelines.size === PANORAMA_PIPELINES.length ? 'Todos' : state.pipelines.size + '/' + PANORAMA_PIPELINES.length;
-  document.getElementById('lbl-advisor').textContent = state.advisors.size === DEFAULT_ADVISORS.length ? 'Todos' : state.advisors.size + '/' + DEFAULT_ADVISORS.length;
+  document.getElementById('lbl-advisor').textContent = state.advisors.size === ALL_ADVISORS.length ? 'Todos' : state.advisors.size + '/' + ALL_ADVISORS.length;
   document.getElementById('lbl-month').textContent = state.months.size === ALL_MONTHS.length ? 'Todos' : state.months.size + '/' + ALL_MONTHS.length;
 
   // Panorama general: pipelines fijos, ignora Pipeline y Asesor, solo respeta Mes (ver getPanoramaRows).
