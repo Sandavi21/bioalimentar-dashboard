@@ -671,7 +671,7 @@ function buildCombo(panelId, lblId, items, stateKey) {
 buildCombo('panel-pipeline','lbl-pipeline', PANORAMA_PIPELINES, 'pipelines');
 buildCombo('panel-advisor','lbl-advisor', DEFAULT_ADVISORS, 'advisors');
 buildCombo('panel-month','lbl-month', ALL_MONTHS, 'months');
-if (META_ACCOUNTS_LIST.length) buildCombo('panel-meta-acc','lbl-meta-acc', META_ACCOUNTS_LIST, 'metaAccounts');
+if (DEFAULT_META_ACCOUNTS.length) buildCombo('panel-meta-acc','lbl-meta-acc', DEFAULT_META_ACCOUNTS, 'metaAccounts');
 
 function toggleCombo(id) {
   const el = document.getElementById(id);
@@ -1314,7 +1314,7 @@ function renderMeta() {
   const segTxt = META_HAS_SEG ? (metaSeg === 'Todas' ? 'todas las campañas' : 'campañas ' + metaSeg) : '';
 
   const accLbl = document.getElementById('lbl-meta-acc');
-  if (accLbl) accLbl.textContent = state.metaAccounts.size === META_ACCOUNTS_LIST.length ? 'Todas' : state.metaAccounts.size + '/' + META_ACCOUNTS_LIST.length;
+  if (accLbl) accLbl.textContent = state.metaAccounts.size === DEFAULT_META_ACCOUNTS.length ? 'Todas' : state.metaAccounts.size + '/' + DEFAULT_META_ACCOUNTS.length;
   const metaSummary = document.getElementById('meta-fb-summary');
   if (metaSummary) metaSummary.textContent = fmtUSD(T.spend) + ' de gasto · ' + uniq(rows.map(r => r.campaign_name)).length + ' campañas';
 
