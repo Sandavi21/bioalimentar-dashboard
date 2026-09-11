@@ -629,6 +629,9 @@ const LINE_STYLES = [
 function uniq(arr) { return [...new Set(arr)]; }
 const ALL_MONTHS = uniq(DATA.map(d => d.month)).sort();
 const META_ACCOUNTS_LIST = (Array.isArray(META) ? uniq(META.map(d => d.account_name)) : []).sort();
+// Cuentas de Meta que se muestran por defecto (pedido explícito del usuario); las demás
+// siguen disponibles para tildar a mano en el filtro de Cuenta.
+const DEFAULT_META_ACCOUNTS = ['BiO Balanceados', 'CANimentos', 'Huevos BiO'].filter(a => META_ACCOUNTS_LIST.includes(a));
 
 // Por defecto solo los 4 pipelines de venta real y los 2 asesores humanos activos
 // (pedido explícito del usuario); se pueden marcar los demás a mano en los filtros.
@@ -636,7 +639,7 @@ let state = {
   pipelines: new Set(PANORAMA_PIPELINES),
   advisors: new Set(DEFAULT_ADVISORS),
   months: new Set(ALL_MONTHS),
-  metaAccounts: new Set(META_ACCOUNTS_LIST)
+  metaAccounts: new Set(DEFAULT_META_ACCOUNTS)
 };
 
 function buildCombo(panelId, lblId, items, stateKey) {
@@ -681,7 +684,7 @@ document.addEventListener('click', (e) => {
 });
 
 function resetFilters() {
-  state = { pipelines: new Set(PANORAMA_PIPELINES), advisors: new Set(DEFAULT_ADVISORS), months: new Set(ALL_MONTHS), metaAccounts: new Set(META_ACCOUNTS_LIST) };
+  state = { pipelines: new Set(PANORAMA_PIPELINES), advisors: new Set(DEFAULT_ADVISORS), months: new Set(ALL_MONTHS), metaAccounts: new Set(DEFAULT_META_ACCOUNTS) };
   document.querySelectorAll('.combo-panel input[type=checkbox]').forEach(cb => {
     cb.checked = state[cb.dataset.statekey].has(cb.dataset.item);
   });
